@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { font-family: Arial; padding: 20px; background:#f9f9f9 }
+.producto { display:flex; justify-content:space-between; margin-bottom:8px; background:#fff; padding:8px }
+button { padding:12px; width:100%; background:#4caf50; color:#fff; border:none }
+</style>
+</head>
+<body>
+
+<h2>Pedido Online</h2>
+<input type="text" id="nombre" placeholder="Tu nombre" style="width:100%; padding:10px">
+
+<div id="productos">Cargando...</div>
+
+<h3>Total: <span id="total">0.00 €</span></h3>
+<button onclick="enviarPedido()">Enviar Pedido</button>
+
+<script>
+const API_URL = "PEGA_AQUI_TU_LINK"; // <- aquí vas a poner tu URL de Apps Script
+
+let productos = [];
+
+fetch(API_URL + "?action=productos")
+  .then(r => r.json())
+  .then(data => {
+    productos = data;
+    const cont = document.getElementById("productos");
+    cont.innerHTML = "";
+
+    data.forEach((p,i)=>{
+      cont.innerHTML += `
+        <div class="producto">
+          <div>${p.nombre} - ${p.precio}</div>
+          <input type="number" min="0" step="${p.salto}" id="p${i}" value="0" onchange="calcular()">
+        </div>`;
+    });
+  });
+
+function calcular(){
+  let t=0;
+  productos.forEach((p,i)=>{
+    const c=parseFloat(document.getElementById("p"+i).value)||0;
+    t+=c*p.precioNum;
+  });
+  document.getElementById("total").innerText=t.toFixed(2)+" €";
+}
+
+function enviarPedido(){
+  const nombre=document.getElementById("nombre").value;
+  let sel=[];
+
+  productos.forEach((p,i)=>{
+    const c=parseFloat(document.getElementById("p"+i).value)||0;
+    if(c>0) sel.push({producto:p.nombre, formato:p.formato, cantidad:c});
+  });
+
+  fetch(API_URL, {
+    method:"POST",
+    body: JSON.stringify({nombre, productos:sel, total:document.getElementById("total").innerText}),
+    headers:{"Content-Type":"application/json"}
+  })
+  .then(r=>r.json())
+  .then(()=>alert("Pedido enviado"));
+}
+</script>
+</body>
+</html>
