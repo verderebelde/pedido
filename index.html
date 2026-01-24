@@ -1,102 +1,110 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Hacer Pedido</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
-        .producto { border-bottom: 1px solid #ccc; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        input[type="number"] { width: 60px; }
-        #total-flotante { position: fixed; bottom: 0; left:0; right:0; background: #333; color: white; padding: 15px; text-align: center; font-size: 1.2em; }
-        .hidden { display: none; }
-    </style>
+<meta charset="UTF-8">
+<title>Pedido Online</title>
+<style>
+body{font-family:Arial;padding:20px;background:#f5f5f5}
+h2{margin-top:30px}
+.producto{display:flex;justify-content:space-between;margin:5px 0;background:white;padding:8px;border-radius:6px}
+input[type=number]{width:70px}
+.total{font-size:22px;margin-top:20px}
+button{padding:12px 20px;font-size:16px;background:green;color:white;border:none;border-radius:8px}
+</style>
 </head>
 <body>
 
-<div id="pantalla-pedido">
-    <h1>Realiza tu Pedido</h1>
-    <input type="text" id="nombreCli" placeholder="Tu Nombre" required>
-    <input type="tel" id="telefonoCli" placeholder="Tu Teléfono" required>
-    
-    <div id="lista-productos">Cargando productos...</div>
-    <div style="height: 80px;"></div> <div id="total-flotante">
-        Total: $<span id="suma-total">0.00</span>
-        <button onclick="enviarPedido()" style="margin-left:20px; padding: 10px;">ENVIAR PEDIDO</button>
-    </div>
-</div>
+<h1>Hacer Pedido</h1>
 
-<div id="pantalla-gracias" class="hidden">
-    <h1>¡GRACIAS POR TU PEDIDO!</h1>
-    <h3>Resumen:</h3>
-    <div id="resumen-final"></div>
-    <button onclick="location.reload()">Nuevo Pedido</button>
-</div>
+Nombre: <input id="nombre"><br><br>
+Teléfono: <input id="movil"><br><br>
+
+<div id="productos"></div>
+
+<div class="total">TOTAL: €<span id="total">0</span></div><br>
+<button onclick="enviarPedido()">ENVIAR PEDIDO</button>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdQsPAPbOUmlxw-L7N-_gjRVG3Yl451xGmYrLa1rLxxMUoNVYphOxWbQ6kvfb_6q2OoA/exec"; // Pega aquí tu URL
-let productosData = [];
+const API_URL = "https://script.google.com/macros/s/AKfycbyst5Kmgp6wqiuFJ_hGUssrbrpBrSsWMhr8jJuayCKtmsYBooBFZVUTColggp9aaOdb/exec";
+let productos = [];
+let carrito = {};
 
-// Cargar productos
-fetch(SCRIPT_URL)
-    .then(res => res.json())
-    .then(data => {
-        productosData = data.slice(1); // Quitar cabecera
-        let html = '';
-        productosData.forEach((prod, index) => {
-            // Estructura: NOMBRE (0), FORMATO (1), PRECIO (2), CATEGORIA (3), MINIMO (4), SALTO (5)
-            html += `
-            <div class="producto">
-                <div>
-                    <strong>${prod[0]}</strong> (${prod[1]}) - $${prod[2]}<br>
-                    <small>${prod[3]}</small>
-                </div>
-                <div>
-                    Cant: <input type="number" id="cant-${index}" 
-                           value="0" min="${prod[4] || 0}" step="${prod[5] || 1}" 
-                           onchange="recalcularTotal()">
-                </div>
-            </div>`;
-        });
-        document.getElementById('lista-productos').innerHTML = html;
-    });
+fetch(API_URL + "?action=productos")
+.then(r=>r.json())
+.then(data=>{
+  productos = data;
+  mostrarProductos();
+});
 
-function recalcularTotal() {
-    let total = 0;
-    productosData.forEach((prod, index) => {
-        let cant = parseFloat(document.getElementById(`cant-${index}`).value);
-        if(cant > 0) total += cant * prod[2];
+function mostrarProductos(){
+  const cont = document.getElementById("productos");
+  let categorias = {};
+
+  productos.forEach((p,i)=>{
+    if(!categorias[p.categoria]) categorias[p.categoria]=[];
+    categorias[p.categoria].push({...p,id:i});
+  });
+
+  for(let cat in categorias){
+    cont.innerHTML += `<h2>${cat}</h2>`;
+    categorias[cat].forEach(p=>{
+      cont.innerHTML += `
+        <div class="producto">
+          <div>${p.nombre} (${p.formato}) - €${p.precio}</div>
+          <input type="number" min="0" step="${p.salto}" value="0"
+            onchange="cambiarCantidad(${p.id}, this.value)">
+        </div>`;
     });
-    document.getElementById('suma-total').innerText = total.toFixed(2);
+  }
 }
 
-function enviarPedido() {
-    const nombre = document.getElementById('nombreCli').value;
-    const telefono = document.getElementById('telefonoCli').value;
-    if(!nombre || !telefono) return alert("Pon tu nombre y teléfono");
+function cambiarCantidad(id, cantidad){
+  const p = productos[id];
+  cantidad = parseFloat(cantidad)||0;
 
-    let resumen = "";
-    let total = 0;
+  if(cantidad>0 && cantidad < p.minimo){
+    alert("Mínimo para "+p.nombre+" es "+p.minimo);
+    return;
+  }
 
-    productosData.forEach((prod, index) => {
-        let cant = parseFloat(document.getElementById(`cant-${index}`).value);
-        if(cant > 0) {
-            resumen += `${prod[0]} x ${cant} (${prod[1]})\n`;
-            total += cant * prod[2];
-        }
-    });
+  carrito[id] = cantidad;
+  calcularTotal();
+}
 
-    if(total === 0) return alert("No has seleccionado nada");
+function calcularTotal(){
+  let total=0;
+  for(let id in carrito){
+    total += carrito[id]*productos[id].precio;
+  }
+  document.getElementById("total").innerText = total.toFixed(2);
+}
 
-    const datos = { nombre, telefono, resumen, total };
+function enviarPedido(){
+  const nombre = document.getElementById("nombre").value;
+  const movil = document.getElementById("movil").value;
 
-    fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify(datos)
-    }).then(() => {
-        document.getElementById('pantalla-pedido').classList.add('hidden');
-        document.getElementById('pantalla-gracias').classList.remove('hidden');
-        document.getElementById('resumen-final').innerText = `${nombre}\n${resumen}\nTOTAL: $${total}`;
-    });
+  let resumen = "";
+  let total = 0;
+
+  for(let id in carrito){
+    if(carrito[id]>0){
+      let p = productos[id];
+      resumen += `${carrito[id]} x ${p.nombre}\n`;
+      total += carrito[id]*p.precio;
+    }
+  }
+
+  fetch(API_URL,{
+    method:"POST",
+    body: JSON.stringify({nombre,movil,pedido:resumen,total})
+  })
+  .then(()=> {
+    document.body.innerHTML = `
+      <h1>GRACIAS POR TU PEDIDO</h1>
+      <pre>${resumen}</pre>
+      <h2>Total €${total.toFixed(2)}</h2>
+    `;
+  });
 }
 </script>
 </body>
