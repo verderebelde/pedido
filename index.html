@@ -1,211 +1,103 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pedido Online</title>
-<style>
-body { font-family: Arial; padding: 20px; background:#f2f2f2 }
-input, button { padding:10px; font-size:16px; margin-bottom:10px; }
-input[type="number"] { width:80px; text-align:center }
-button { background:#4caf50; color:#fff; border:none; cursor:pointer; }
-.categoria { margin-top:20px; font-weight:bold }
-.producto { display:flex; justify-content:space-between; background:#fff; padding:8px; margin-bottom:5px; border-radius:4px; }
-.total { margin-top:20px; font-size:18px; font-weight:bold; }
-</style>
+    <meta charset="UTF-8">
+    <title>Hacer Pedido</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+        .producto { border-bottom: 1px solid #ccc; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        input[type="number"] { width: 60px; }
+        #total-flotante { position: fixed; bottom: 0; left:0; right:0; background: #333; color: white; padding: 15px; text-align: center; font-size: 1.2em; }
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
 
-<h2>Pedido Online</h2>
-<input type="text" id="nombre" placeholder="Nombre completo" style="width:100%;">
-<input type="tel" id="telefono" placeholder="Teléfono" style="width:100%;">
+<div id="pantalla-pedido">
+    <h1>Realiza tu Pedido</h1>
+    <input type="text" id="nombreCli" placeholder="Tu Nombre" required>
+    <input type="tel" id="telefonoCli" placeholder="Tu Teléfono" required>
+    
+    <div id="lista-productos">Cargando productos...</div>
+    <div style="height: 80px;"></div> <div id="total-flotante">
+        Total: $<span id="suma-total">0.00</span>
+        <button onclick="enviarPedido()" style="margin-left:20px; padding: 10px;">ENVIAR PEDIDO</button>
+    </div>
+</div>
 
-<div id="productos">Cargando productos...</div>
-
-<div class="total">Total: <span id="total">0.00 €</span></div>
-<button onclick="enviarPedido()">Enviar Pedido</button>
+<div id="pantalla-gracias" class="hidden">
+    <h1>¡GRACIAS POR TU PEDIDO!</h1>
+    <h3>Resumen:</h3>
+    <div id="resumen-final"></div>
+    <button onclick="location.reload()">Nuevo Pedido</button>
+</div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxkT8ykFvQ6ox2KjWLdwBirYdl1KTQNt2u7MuX39LXv4IrM0AoaYAv5CY6BFdP3KmUY/exec";
-let productos = [];
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdQsPAPbOUmlxw-L7N-_gjRVG3Yl451xGmYrLa1rLxxMUoNVYphOxWbQ6kvfb_6q2OoA/exec"; // Pega aquí tu URL
+let productosData = [];
 
-fetch(API_URL + "?action=productos")
-.then(r => r.json())
-.then(data => {
-  productos = data;
-  const cont = document.getElementById("productos");
-  cont.innerHTML = "";
-
-  let categorias = {};
-  data.forEach((p,i)=>{
-    if(!categorias[p.categoria]) categorias[p.categoria] = [];
-    categorias[p.categoria].push({...p,id:i});
-  });
-
-  for (let cat in categorias){
-    cont.innerHTML += `<div class="categoria">${cat}</div>`;
-    categorias[cat].forEach(p=>{
-      cont.innerHTML += `
-      <div class="producto">
-        <div>${p.nombre}<br><small>${p.formato} - ${p.precio}</small></div>
-        <input type="number" id="p${p.id}" min="0" step="${p.salto}" value="0"
-               onblur="validarMinimo(${p.id})" oninput="calcular()">
-      </div>`;
+// Cargar productos
+fetch(SCRIPT_URL)
+    .then(res => res.json())
+    .then(data => {
+        productosData = data.slice(1); // Quitar cabecera
+        let html = '';
+        productosData.forEach((prod, index) => {
+            // Estructura: NOMBRE (0), FORMATO (1), PRECIO (2), CATEGORIA (3), MINIMO (4), SALTO (5)
+            html += `
+            <div class="producto">
+                <div>
+                    <strong>${prod[0]}</strong> (${prod[1]}) - $${prod[2]}<br>
+                    <small>${prod[3]}</small>
+                </div>
+                <div>
+                    Cant: <input type="number" id="cant-${index}" 
+                           value="0" min="${prod[4] || 0}" step="${prod[5] || 1}" 
+                           onchange="recalcularTotal()">
+                </div>
+            </div>`;
+        });
+        document.getElementById('lista-productos').innerHTML = html;
     });
-  }
-})
-.catch(err => {
-  document.getElementById("productos").innerText = "❌ Error cargando productos";
-  console.error(err);
-});
 
-function validarMinimo(id){
-  const input = document.getElementById("p"+id);
-  const p = productos[id];
-  let val = parseFloat(input.value)||0;
-
-  if(val>0 && val<p.minimo) val = p.minimo;
-  if(p.salto>0) val = Math.round(val/p.salto)*p.salto;
-
-  input.value = val.toFixed(2);
-  calcular();
+function recalcularTotal() {
+    let total = 0;
+    productosData.forEach((prod, index) => {
+        let cant = parseFloat(document.getElementById(`cant-${index}`).value);
+        if(cant > 0) total += cant * prod[2];
+    });
+    document.getElementById('suma-total').innerText = total.toFixed(2);
 }
 
-function calcular(){
-  let t=0;
-  productos.forEach((p,i)=>{
-    const c=parseFloat(document.getElementById("p"+i)?.value)||0;
-    t += c * p.precioNum;
-  });
-  document.getElementById("total").innerText = t.toFixed(2)+" €";
-}
+function enviarPedido() {
+    const nombre = document.getElementById('nombreCli').value;
+    const telefono = document.getElementById('telefonoCli').value;
+    if(!nombre || !telefono) return alert("Pon tu nombre y teléfono");
 
-function enviarPedido(){
-  const nombre = document.getElementById("nombre").value.trim();
-  const tel = document.getElementById("telefono").value.trim();
-  if(!nombre || !tel){ alert("Completa nombre y teléfono"); return; }
+    let resumen = "";
+    let total = 0;
 
-  let sel = [];
-  productos.forEach((p,i)=>{
-    const c = parseFloat(document.getElementById("p"+i).value)||0;
-    if(c>0) sel.push({nombre:p.nombre, formato:p.formato, cantidad:c});
-  });
+    productosData.forEach((prod, index) => {
+        let cant = parseFloat(document.getElementById(`cant-${index}`).value);
+        if(cant > 0) {
+            resumen += `${prod[0]} x ${cant} (${prod[1]})\n`;
+            total += cant * prod[2];
+        }
+    });
 
-  if(sel.length===0){ alert("No seleccionaste productos"); return; }
+    if(total === 0) return alert("No has seleccionado nada");
 
-  const totalTexto = document.getElementById("total").innerText;
+    const datos = { nombre, telefono, resumen, total };
 
-  fetch(API_URL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({nombre, telefono:tel, productos:sel, total:totalTexto})
-  })
-  .then(r => r.json())
-  .then(res => {
-    if(res.status==="ok"){
-      document.body.innerHTML = `
-        <h2>Gracias por tu pedido</h2>
-        <p><strong>Nombre:</strong> ${nombre}</p>
-        <p><strong>Teléfono:</strong> ${tel}</p>
-        <p><strong>Pedido:</strong> ${sel.map(p=>p.nombre+" ("+p.formato+") x "+p.cantidad).join(", ")}</p>
-        <p><strong>Total:</strong> ${totalTexto}</p>`;
-    } else {
-      alert("Error al enviar pedido");
-    }
-  })
-  .catch(err => { console.error(err); alert("Error al enviar pedido"); });
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(datos)
+    }).then(() => {
+        document.getElementById('pantalla-pedido').classList.add('hidden');
+        document.getElementById('pantalla-gracias').classList.remove('hidden');
+        document.getElementById('resumen-final').innerText = `${nombre}\n${resumen}\nTOTAL: $${total}`;
+    });
 }
 </script>
-
-</body>
-</html>
-fetch(API_URL + "?action=productos")
-.then(r => r.json())
-.then(data => {
-  productos = data;
-  const cont = document.getElementById("productos");
-  cont.innerHTML = "";
-
-  let categorias = {};
-  data.forEach((p,i)=>{
-    if(!categorias[p.categoria]) categorias[p.categoria] = [];
-    categorias[p.categoria].push({...p,id:i});
-  });
-
-  for (let cat in categorias){
-    cont.innerHTML += `<div class="categoria">${cat}</div>`;
-    categorias[cat].forEach(p=>{
-      cont.innerHTML += `
-      <div class="producto">
-        <div>${p.nombre}<br><small>${p.formato} - ${p.precio}</small></div>
-        <input type="number" id="p${p.id}" min="0" step="${p.salto}" value="0"
-               onblur="validarMinimo(${p.id})" oninput="calcular()">
-      </div>`;
-    });
-  }
-})
-.catch(err => {
-  document.getElementById("productos").innerText = "❌ Error cargando productos";
-  console.error(err);
-});
-
-function validarMinimo(id){
-  const input = document.getElementById("p"+id);
-  const p = productos[id];
-  let val = parseFloat(input.value)||0;
-
-  if(val>0 && val<p.minimo) val = p.minimo;
-  if(p.salto>0) val = Math.round(val/p.salto)*p.salto;
-
-  input.value = val.toFixed(2);
-  calcular();
-}
-
-function calcular(){
-  let t=0;
-  productos.forEach((p,i)=>{
-    const c=parseFloat(document.getElementById("p"+i)?.value)||0;
-    t += c * p.precioNum;
-  });
-  document.getElementById("total").innerText = t.toFixed(2)+" €";
-}
-
-function enviarPedido(){
-  const nombre = document.getElementById("nombre").value.trim();
-  const tel = document.getElementById("telefono").value.trim();
-  if(!nombre || !tel){ alert("Completa nombre y teléfono"); return; }
-
-  let sel = [];
-  productos.forEach((p,i)=>{
-    const c = parseFloat(document.getElementById("p"+i).value)||0;
-    if(c>0) sel.push({nombre:p.nombre, formato:p.formato, cantidad:c});
-  });
-
-  if(sel.length===0){ alert("No seleccionaste productos"); return; }
-
-  const totalTexto = document.getElementById("total").innerText;
-
-  fetch(API_URL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({nombre, telefono:tel, productos:sel, total:totalTexto})
-  })
-  .then(r => r.json())
-  .then(res => {
-    if(res.status==="ok"){
-      document.body.innerHTML = `
-        <h2>Gracias por tu pedido</h2>
-        <p><strong>Nombre:</strong> ${nombre}</p>
-        <p><strong>Teléfono:</strong> ${tel}</p>
-        <p><strong>Pedido:</strong> ${sel.map(p=>p.nombre+" ("+p.formato+") x "+p.cantidad).join(", ")}</p>
-        <p><strong>Total:</strong> ${totalTexto}</p>`;
-    } else {
-      alert("Error al enviar pedido");
-    }
-  })
-  .catch(err => { console.error(err); alert("Error al enviar pedido"); });
-}
-</script>
-
 </body>
 </html>
