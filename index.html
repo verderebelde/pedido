@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <base target="_top">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-    .categoria-titulo { margin-top: 20px; padding: 8px; font-weight: bold; color: #fff; border-radius: 4px; }
-    .categoria-VERDURAS { background-color: #4caf50; }
-    .categoria-FRUTAS { background-color: #ff9800; }
-    .categoria-LACTEOS { background-color: #2196f3; }
-    .categoria-OTROS { background-color: #9c27b0; }
-    .producto-row { display: flex; align-items: center; justify-content: space-between; background: white; padding: 10px; border-bottom: 1px solid #eee; }
-    .producto-info { flex: 1; }
-    .producto-row input { width: 70px; padding: 8px; text-align: center; border: 1px solid #ddd; }
-    .total-container { margin-top: 20px; padding: 15px; background: #fff; border-top: 3px solid #4caf50; text-align: right; }
-    .nota-pie { margin-top: 15px; font-style: italic; color: #d35400; font-weight: bold; text-align: center; }
-    button { background: #4caf50; color: white; padding: 15px; width: 100%; border: none; font-size: 18px; cursor: pointer; border-radius: 5px; }
-    input[type="text"], input[type="tel"] { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedido Online</title>
+<style>
+body { font-family: Arial, sans-serif; padding: 20px; background:#f9f9f9 }
+.producto { display:flex; justify-content:space-between; margin-bottom:8px; background:#fff; padding:8px }
+button { padding:12px; width:100%; background:#4caf50; color:#fff; border:none; cursor:pointer; border-radius:5px; }
+input[type="text"], input[type="tel"], input[type="number"] { width:100%; padding:10px; margin-bottom:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; }
+.categoria-titulo { margin-top:20px; padding:8px; font-weight:bold; color:#fff; border-radius:4px; }
+.categoria-VERDURAS { background:#4caf50; }
+.categoria-FRUTAS { background:#ff9800; }
+.categoria-LACTEOS { background:#2196f3; }
+.categoria-OTROS { background:#9c27b0; }
+.producto-row { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px; border-bottom:1px solid #eee; }
+.producto-info { flex:1; }
+.total-container { margin-top:20px; padding:15px; background:#fff; border-top:3px solid #4caf50; text-align:right; }
+.nota-pie { margin-top:15px; font-style:italic; color:#d35400; font-weight:bold; text-align:center; }
+</style>
 </head>
 <body>
 
@@ -35,41 +36,43 @@
 <div class="nota-pie">"Se pide por unidad, se pone por kg"</div>
 
 <script>
+const API_URL = "https://script.google.com/macros/s/AKfycbws6PogmTBDkSmDJVKF1DakJ7afN4C2ypV571co4PVNULvk7QG7QozBdsKCXhhwpWjn/exec"; // TU URL de Apps Script
+const MI_TELEFONO_RECEPCION = "34644406366"; // TU número
+
 let productosGlobal = [];
-const MI_TELEFONO_RECEPCION = "34644406366"; // <-- TU NÚMERO
-const API_URL = "https://script.google.com/macros/s/AKfycbzPhqNYh6loCeXJsVeNIydm0id8ghfiuds1DLm7A9peABhsmyjaTBB_t_pXaKVULTKC/exec"; // <-- TU WEB APP URL
 
 // Cargar productos desde Apps Script
-window.onload = () => {
-  google.script.run.withSuccessHandler(datos => {
-    productosGlobal = datos;
-    const cont = document.getElementById("productos");
-    cont.innerHTML = "";
-    let cats = {};
-    datos.forEach((p,i) => {
-      if (!cats[p.categoria]) cats[p.categoria] = [];
-      cats[p.categoria].push({...p, id: i});
-    });
-    for (let c in cats) {
-      cont.innerHTML += `<div class="categoria-titulo categoria-${c}">${c}</div>`;
-      cats[c].forEach(p => {
-        cont.innerHTML += `<div class="producto-row">
-          <div class="producto-info"><strong>${p.nombre}</strong><br><small>${p.formato} - ${p.precio}</small></div>
-          <input type="number" id="prod_${p.id}" step="${p.salto}" min="0" value="0" onchange="ajustarMinimo(this, ${p.minimo})" oninput="calcularTotal()">
-        </div>`;
+function cargarProductos() {
+  fetch(API_URL + "?action=productos")
+    .then(r => r.json())
+    .then(data => {
+      productosGlobal = data;
+      const cont = document.getElementById("productos");
+      cont.innerHTML = "";
+      let cats = {};
+      data.forEach((p,i) => {
+        if(!cats[p.categoria]) cats[p.categoria] = [];
+        cats[p.categoria].push({...p, id:i});
       });
-    }
-  }).obtenerProductos();
-};
-
-function ajustarMinimo(input, min) {
-  let val = parseFloat(input.value);
-  if (val > 0 && val < min) { input.value = min; calcularTotal(); }
+      for(let c in cats){
+        cont.innerHTML += `<div class="categoria-titulo categoria-${c}">${c}</div>`;
+        cats[c].forEach(p => {
+          cont.innerHTML += `
+            <div class="producto-row">
+              <div class="producto-info"><strong>${p.nombre}</strong><br><small>${p.formato} - ${p.precio}</small></div>
+              <input type="number" min="0" step="${p.salto}" id="prod_${p.id}" value="0" onchange="calcularTotal()">
+            </div>`;
+        });
+      }
+    })
+    .catch(e => {
+      document.getElementById("productos").innerText = "Error cargando productos: " + e;
+    });
 }
 
 function calcularTotal() {
   let t = 0;
-  productosGlobal.forEach((p,i) => {
+  productosGlobal.forEach((p,i)=>{
     let cant = parseFloat(document.getElementById("prod_" + i).value) || 0;
     t += cant * p.precioNum;
   });
@@ -82,29 +85,35 @@ function enviarPedido() {
   const tel = document.getElementById("telefono").value.trim();
   const btn = document.getElementById("btnEnviar");
   
-  if (!n || !tel) { alert("Nombre y teléfono son obligatorios"); return; }
-  
+  if(!n || !tel){ alert("Nombre y teléfono son obligatorios"); return; }
+
   let sel = [];
   let textoWhatsApp = `*Nuevo Pedido*\n*Cliente:* ${n}\n*Tel:* ${tel}\n----------\n`;
   
-  productosGlobal.forEach((p,i) => {
+  productosGlobal.forEach((p,i)=>{
     let cant = parseFloat(document.getElementById("prod_" + i).value) || 0;
-    if (cant > 0) {
-      sel.push({producto: p.nombre, formato: p.formato, cantidad: cant });
+    if(cant>0){
+      sel.push({producto: p.nombre, formato: p.formato, cantidad: cant});
       textoWhatsApp += `- ${cant}x ${p.nombre} (${p.formato})\n`;
     }
   });
-  
-  if (sel.length === 0) { alert("No has seleccionado productos"); return; }
-  
+
+  if(sel.length === 0){ alert("No has seleccionado productos"); return; }
+
   textoWhatsApp += `----------\n*Total: ${document.getElementById("total").innerText}*`;
   btn.disabled = true;
   btn.innerText = "Registrando...";
 
-  // Guardar en Google Sheets y luego abrir WhatsApp
-  google.script.run.withSuccessHandler(() => {
+  // Enviar pedido a Google Sheets
+  fetch(API_URL, {
+    method:"POST",
+    body: JSON.stringify({nombre:n, telefono:tel, productos:sel, total:calcularTotal(), hoja:"PEDIDOS"}),
+    headers:{"Content-Type":"application/json"}
+  })
+  .then(r=>r.json())
+  .then(()=>{
+    // Abrir WhatsApp
     const url = "https://api.whatsapp.com/send?phone=" + MI_TELEFONO_RECEPCION + "&text=" + encodeURIComponent(textoWhatsApp);
-    
     document.body.innerHTML = `
       <div style="text-align:center; padding:50px;">
         <h2>¡Casi listo!</h2>
@@ -113,14 +122,15 @@ function enviarPedido() {
           ENVIAR POR WHATSAPP
         </a>
       </div>`;
-  }).enviarDatos({ 
-    nombre: n, 
-    telefono: tel, 
-    productos: sel, 
-    total: calcularTotal(),
-    hoja: "PEDIDOS"
+  })
+  .catch(e=>{
+    alert("Error al enviar pedido: " + e);
+    btn.disabled=false;
+    btn.innerText="Enviar y Confirmar WhatsApp";
   });
 }
+
+window.onload = cargarProductos;
 </script>
 </body>
 </html>
