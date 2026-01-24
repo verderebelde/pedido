@@ -31,6 +31,10 @@ fetch(API_URL + "?action=productos")
         </div>`;
     });
   }
+})
+.catch(err=>{
+  document.getElementById("productos").innerHTML = "❌ Error cargando productos";
+  console.error(err);
 });
 
 function validarMinimo(id){
@@ -38,10 +42,56 @@ function validarMinimo(id){
   const p = productos[id];
   let val = parseFloat(input.value) || 0;
 
+  // Respetar mínimo
   if(val > 0 && val < p.minimo){
-    input.value = p.minimo;
+    val = p.minimo;
   }
 
+  // Ajustar al múltiplo del salto
+  if(p.salto > 0){
+    val = Math.round(val / p.salto) * p.salto;
+  }
+
+  input.value = val.toFixed(2);
+  calcular();
+}
+
+function calcular(){
+  let t=0;
+  productos.forEach((p,i)=>{
+    const c=parseFloat(document.getElementById("p"+i)?.value)||0;
+    t+=c*p.precioNum;
+  });
+  document.getElementById("total").innerText=t.toFixed(2)+" €";
+}
+
+function enviarPedido(){
+  const nombre=document.getElementById("nombre").value.trim();
+  const tel=document.getElementById("telefono").value.trim();
+
+  if(!nombre || !tel){ alert("Completa nombre y teléfono"); return; }
+
+  let sel=[];
+  productos.forEach((p,i)=>{
+    const c=parseFloat(document.getElementById("p"+i).value)||0;
+    if(c>0) sel.push({producto:p.nombre, formato:p.formato, cantidad:c});
+  });
+
+  if(sel.length===0){ alert("No seleccionaste productos"); return; }
+
+  fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({nombre, telefono:tel, productos:sel, total:document.getElementById("total").innerText}),
+    headers:{"Content-Type":"application/json"}
+  })
+  .then(r=>r.json())
+  .then(()=>{
+    alert("✅ Pedido enviado correctamente");
+    location.reload();
+  })
+  .catch(()=>alert("❌ Error enviando pedido"));
+}
+</script>
   // Ajustar al múltiplo del salto
   val = parseFloat(input.value) || 0;
   if(p.salto > 0){
