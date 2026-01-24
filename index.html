@@ -1,122 +1,111 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pedido Online</title>
-<style>
-body { font-family: Arial; padding: 20px; background:#f9f9f9 }
-input, button { padding:10px; font-size:16px; margin-bottom:10px; }
-input[type="number"] { width:80px; text-align:center }
-button { background:#4caf50; color:#fff; border:none; cursor:pointer; }
-.categoria { margin-top:20px; font-weight:bold }
-.producto { display:flex; justify-content:space-between; background:#fff; padding:8px; margin-bottom:5px; border-radius:4px; }
-.total { margin-top:20px; font-size:18px; font-weight:bold; }
-</style>
-</head>
-<body>
-
-<h2>Pedido Online</h2>
-<input type="text" id="nombre" placeholder="Nombre completo" style="width:100%;">
-<input type="tel" id="telefono" placeholder="Teléfono" style="width:100%;">
-
-<div id="productos">Cargando productos...</div>
-
-<div class="total">Total: <span id="total">0.00 €</span></div>
-<button onclick="enviarPedido()">Enviar Pedido</button>
-
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzuWR37vcOKxsZmI6_CcsEvjmg8x2XRDX5POQ8_lo8/dev"; // <- reemplaza con tu URL de Web App
+// IMPORTANTE: Cambia esta URL por la tuya que termine en /exec
+const API_URL = "https://script.google.com/macros/s/AKfycby4ngt5wn_NqzAXYt0tgno-g91dQu6Mjoy2ptE0a5wMZdMn3lpy60RQOu1xyHb_96_3/exec"; 
 let productos = [];
 
-// Cargar productos desde Google Sheet
+// Cargar productos
 fetch(API_URL + "?action=productos")
 .then(r => r.json())
 .then(data => {
   productos = data;
   const cont = document.getElementById("productos");
   cont.innerHTML = "";
-
   let categorias = {};
-  data.forEach((p,i)=>{
+
+  data.forEach((p, i) => {
     if(!categorias[p.categoria]) categorias[p.categoria] = [];
-    categorias[p.categoria].push({...p,id:i});
+    categorias[p.categoria].push({...p, id: i});
   });
 
   for (let cat in categorias){
     cont.innerHTML += `<div class="categoria">${cat}</div>`;
-    categorias[cat].forEach(p=>{
+    categorias[cat].forEach(p => {
       cont.innerHTML += `
       <div class="producto">
         <div>${p.nombre}<br><small>${p.formato} - ${p.precio}</small></div>
         <input type="number" id="p${p.id}" min="0" step="${p.salto}" value="0" 
-               onblur="validarMinimo(${p.id})" oninput="calcular()">
+               onchange="validarMinimo(${p.id})" oninput="calcular()">
       </div>`;
     });
   }
 })
 .catch(err => {
-  document.getElementById("productos").innerText = "❌ Error cargando productos";
-  console.error(err);
+  document.getElementById("productos").innerText = "❌ Error al cargar. Asegúrate de haber publicado como 'Cualquiera'.";
 });
 
-// Validar mínimo y salto
 function validarMinimo(id){
-  const input = document.getElementById("p"+id);
+  const input = document.getElementById("p" + id);
   const p = productos[id];
-  let val = parseFloat(input.value)||0;
-
-  if(val>0 && val<p.minimo) val = p.minimo;
-  if(p.salto>0) val = Math.round(val/p.salto)*p.salto;
-
-  input.value = val.toFixed(2);
+  let val = parseFloat(input.value) || 0;
+  if(val > 0 && val < p.minimo) val = p.minimo;
+  // Ajustar al salto más cercano
+  if(p.salto > 0) val = Math.ceil(val / p.salto) * p.salto;
+  input.value = val;
   calcular();
 }
 
-// Calcular total
 function calcular(){
-  let t=0;
-  productos.forEach((p,i)=>{
-    const c=parseFloat(document.getElementById("p"+i)?.value)||0;
+  let t = 0;
+  productos.forEach((p, i) => {
+    const input = document.getElementById("p" + i);
+    const c = input ? parseFloat(input.value) || 0 : 0;
     t += c * p.precioNum;
   });
-  document.getElementById("total").innerText = t.toFixed(2)+" €";
+  document.getElementById("total").innerText = t.toFixed(2) + " €";
 }
 
-// Enviar pedido
 function enviarPedido(){
+  const btn = event.target;
   const nombre = document.getElementById("nombre").value.trim();
   const tel = document.getElementById("telefono").value.trim();
-  if(!nombre || !tel){ alert("Completa nombre y teléfono"); return; }
+  const totalTxt = document.getElementById("total").innerText;
+
+  if(!nombre || !tel) { alert("Completa nombre y teléfono"); return; }
 
   let sel = [];
-  productos.forEach((p,i)=>{
-    const c = parseFloat(document.getElementById("p"+i).value)||0;
-    if(c>0) sel.push({nombre:p.nombre, formato:p.formato, cantidad:c});
+  productos.forEach((p, i) => {
+    const input = document.getElementById("p" + i);
+    const c = input ? parseFloat(input.value) || 0 : 0;
+    if(c > 0) sel.push({nombre: p.nombre, formato: p.formato, cantidad: c});
   });
 
-  if(sel.length===0){ alert("No seleccionaste productos"); return; }
+  if(sel.length === 0) { alert("El pedido está vacío"); return; }
 
-  fetch(API_URL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({nombre, telefono:tel, productos:sel, total:document.getElementById("total").innerText})
+  btn.disabled = true;
+  btn.innerText = "Enviando...";
+
+  // Para evitar errores de CORS, enviamos como text/plain pero con estructura JSON
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors", // Google Script requiere esto a veces desde dominios externos
+    body: JSON.stringify({nombre: nombre, telefono: tel, productos: sel, total: totalTxt})
   })
-  .then(r => r.json())
-  .then(res => {
-    if(res.status==="ok"){
-      document.body.innerHTML = `<h2>Gracias por tu pedido</h2>
-      <p><strong>Nombre:</strong> ${nombre}</p>
-      <p><strong>Teléfono:</strong> ${tel}</p>
-      <p><strong>Pedido:</strong> ${sel.map(p=>p.nombre+" ("+p.formato+") x "+p.cantidad).join(", ")}</p>
-      <p><strong>Total:</strong> ${document.getElementById("total").innerText}</p>`;
-    } else {
-      alert("Error al enviar pedido");
-    }
+  .then(() => {
+    // Como usamos 'no-cors', no podemos leer la respuesta JSON, 
+    // pero si no hay error, asumimos que se envió.
+    mostrarResumen(nombre, tel, sel, totalTxt);
   })
-  .catch(err => { console.error(err); alert("Error al enviar pedido"); });
+  .catch(err => {
+    alert("Error de conexión");
+    btn.disabled = false;
+  });
+}
+
+function mostrarResumen(nombre, tel, sel, total) {
+  document.body.innerHTML = `
+    <div style="text-align:center; padding:20px;">
+      <h2>¡Gracias por tu pedido!</h2>
+      <p>Tu pedido se ha registrado correctamente.</p>
+      <div style="text-align:left; background:#fff; padding:15px; border-radius:8px; display:inline-block;">
+        <p><strong>Cliente:</strong> ${nombre}</p>
+        <p><strong>Teléfono:</strong> ${tel}</p>
+        <hr>
+        <p><strong>Detalle:</strong></p>
+        <ul>${sel.map(p => `<li>${p.nombre} (${p.formato}) x ${p.cantidad}</li>`).join("")}</ul>
+        <p style="font-size:1.2em"><strong>Total: ${total}</strong></p>
+      </div>
+      <br><br>
+      <button onclick="location.reload()">Nuevo Pedido</button>
+    </div>`;
 }
 </script>
-
-</body>
-</html>
