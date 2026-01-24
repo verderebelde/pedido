@@ -1,38 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pedido Online</title>
-
 <style>
 body { font-family: Arial; padding: 20px; background:#f9f9f9 }
+input, button { padding:10px; font-size:16px; margin-bottom:10px; }
+input[type="number"] { width:80px; text-align:center }
+button { background:#4caf50; color:#fff; border:none; cursor:pointer; }
 .categoria { margin-top:20px; font-weight:bold }
-.producto { display:flex; justify-content:space-between; margin-bottom:8px; background:#fff; padding:8px }
-input { width:70px; padding:6px; text-align:center }
-button { padding:14px; width:100%; background:#4caf50; color:#fff; border:none; font-size:16px }
-.total { margin-top:15px; font-size:18px }
+.producto { display:flex; justify-content:space-between; background:#fff; padding:8px; margin-bottom:5px; border-radius:4px; }
+.total { margin-top:20px; font-size:18px; font-weight:bold; }
 </style>
 </head>
-
 <body>
 
 <h2>Pedido Online</h2>
-
-<input type="text" id="nombre" placeholder="Nombre completo" style="width:100%; padding:10px; margin-bottom:8px">
-<input type="tel" id="telefono" placeholder="Teléfono" style="width:100%; padding:10px; margin-bottom:15px">
+<input type="text" id="nombre" placeholder="Nombre completo" style="width:100%;">
+<input type="tel" id="telefono" placeholder="Teléfono" style="width:100%;">
 
 <div id="productos">Cargando productos...</div>
 
-<div class="total">Total: <strong><span id="total">0.00 €</span></strong></div>
-<br>
+<div class="total">Total: <span id="total">0.00 €</span></div>
 <button onclick="enviarPedido()">Enviar Pedido</button>
 
-<!-- 🔥 EL SCRIPT VA JUSTO ANTES DE CERRAR BODY -->
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyMBGF9E64OBxyzXRWKh0nH9ZwmPT1XVipSZ_iNRDxPQ59vuCx-xeIyAMuWsdZPW8w9/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzO996uIi2KWR_vXFdcdJP8dQIVQJX5QaskAANEs5qJ-HPULuSn3AAvdf6dLuXKhrWJ/exec"; // <- reemplaza con tu URL de Web App
 let productos = [];
 
+// Cargar productos desde Google Sheet
 fetch(API_URL + "?action=productos")
 .then(r => r.json())
 .then(data => {
@@ -50,75 +47,74 @@ fetch(API_URL + "?action=productos")
     cont.innerHTML += `<div class="categoria">${cat}</div>`;
     categorias[cat].forEach(p=>{
       cont.innerHTML += `
-        <div class="producto">
-          <div>${p.nombre}<br><small>${p.formato} - ${p.precio}</small></div>
-          <input type="number"
-                 id="p${p.id}"
-                 min="0"
-                 step="${p.salto}"
-                 value="0"
-                 onblur="validarMinimo(${p.id})"
-                 oninput="calcular()">
-        </div>`;
+      <div class="producto">
+        <div>${p.nombre}<br><small>${p.formato} - ${p.precio}</small></div>
+        <input type="number" id="p${p.id}" min="0" step="${p.salto}" value="0" 
+               onblur="validarMinimo(${p.id})" oninput="calcular()">
+      </div>`;
     });
   }
 })
-.catch(err=>{
-  document.getElementById("productos").innerHTML = "❌ Error cargando productos";
+.catch(err => {
+  document.getElementById("productos").innerText = "❌ Error cargando productos";
   console.error(err);
 });
 
+// Validar mínimo y salto
 function validarMinimo(id){
   const input = document.getElementById("p"+id);
   const p = productos[id];
-  let val = parseFloat(input.value) || 0;
+  let val = parseFloat(input.value)||0;
 
-  if(val > 0 && val < p.minimo){
-    val = p.minimo;
-  }
-
-  if(p.salto > 0){
-    val = Math.round(val / p.salto) * p.salto;
-  }
+  if(val>0 && val<p.minimo) val = p.minimo;
+  if(p.salto>0) val = Math.round(val/p.salto)*p.salto;
 
   input.value = val.toFixed(2);
   calcular();
 }
 
+// Calcular total
 function calcular(){
   let t=0;
   productos.forEach((p,i)=>{
     const c=parseFloat(document.getElementById("p"+i)?.value)||0;
-    t+=c*p.precioNum;
+    t += c * p.precioNum;
   });
-  document.getElementById("total").innerText=t.toFixed(2)+" €";
+  document.getElementById("total").innerText = t.toFixed(2)+" €";
 }
 
+// Enviar pedido
 function enviarPedido(){
-  const nombre=document.getElementById("nombre").value.trim();
-  const tel=document.getElementById("telefono").value.trim();
-
+  const nombre = document.getElementById("nombre").value.trim();
+  const tel = document.getElementById("telefono").value.trim();
   if(!nombre || !tel){ alert("Completa nombre y teléfono"); return; }
 
-  let sel=[];
+  let sel = [];
   productos.forEach((p,i)=>{
-    const c=parseFloat(document.getElementById("p"+i).value)||0;
-    if(c>0) sel.push({producto:p.nombre, formato:p.formato, cantidad:c});
+    const c = parseFloat(document.getElementById("p"+i).value)||0;
+    if(c>0) sel.push({nombre:p.nombre, formato:p.formato, cantidad:c});
   });
 
   if(sel.length===0){ alert("No seleccionaste productos"); return; }
 
   fetch(API_URL,{
     method:"POST",
-    body:JSON.stringify({nombre, telefono:tel, productos:sel, total:document.getElementById("total").innerText}),
-    headers:{"Content-Type":"application/json"}
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({nombre, telefono:tel, productos:sel, total:document.getElementById("total").innerText})
   })
-  .then(r=>r.json())
-  .then(()=>{
-    alert("✅ Pedido enviado correctamente");
-    location.reload();
+  .then(r => r.json())
+  .then(res => {
+    if(res.status==="ok"){
+      document.body.innerHTML = `<h2>Gracias por tu pedido</h2>
+      <p><strong>Nombre:</strong> ${nombre}</p>
+      <p><strong>Teléfono:</strong> ${tel}</p>
+      <p><strong>Pedido:</strong> ${sel.map(p=>p.nombre+" ("+p.formato+") x "+p.cantidad).join(", ")}</p>
+      <p><strong>Total:</strong> ${document.getElementById("total").innerText}</p>`;
+    } else {
+      alert("Error al enviar pedido");
+    }
   })
-  .catch(()=>alert("❌ Error enviando pedido"));
+  .catch(err => { console.error(err); alert("Error al enviar pedido"); });
 }
 </script>
 
