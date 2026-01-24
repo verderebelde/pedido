@@ -1,136 +1,89 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pedido Online</title>
-<style>
-body { font-family: Arial, sans-serif; padding: 20px; background:#f9f9f9 }
-.producto { display:flex; justify-content:space-between; margin-bottom:8px; background:#fff; padding:8px }
-button { padding:12px; width:100%; background:#4caf50; color:#fff; border:none; cursor:pointer; border-radius:5px; }
-input[type="text"], input[type="tel"], input[type="number"] { width:100%; padding:10px; margin-bottom:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; }
-.categoria-titulo { margin-top:20px; padding:8px; font-weight:bold; color:#fff; border-radius:4px; }
-.categoria-VERDURAS { background:#4caf50; }
-.categoria-FRUTAS { background:#ff9800; }
-.categoria-LACTEOS { background:#2196f3; }
-.categoria-OTROS { background:#9c27b0; }
-.producto-row { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px; border-bottom:1px solid #eee; }
-.producto-info { flex:1; }
-.total-container { margin-top:20px; padding:15px; background:#fff; border-top:3px solid #4caf50; text-align:right; }
-.nota-pie { margin-top:15px; font-style:italic; color:#d35400; font-weight:bold; text-align:center; }
-</style>
-</head>
-<body>
-
-<h2>Pedido Online</h2>
-<input type="text" id="nombre" placeholder="Nombre completo (obligatorio)">
-<input type="tel" id="telefono" placeholder="Número de teléfono (obligatorio)">
-
-<div id="productos">Cargando...</div>
-
-<div class="total-container">
-  <strong>Total: <span id="total">0,00 €</span></strong>
-  <button id="btnEnviar" onclick="enviarPedido()">Enviar y Confirmar WhatsApp</button>
-</div>
-
-<div class="nota-pie">"Se pide por unidad, se pone por kg"</div>
-
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbws6PogmTBDkSmDJVKF1DakJ7afN4C2ypV571co4PVNULvk7QG7QozBdsKCXhhwpWjn/exec"; // TU URL de Apps Script
-const MI_TELEFONO_RECEPCION = "34644406366"; // TU número
+const API_URL = "https://script.google.com/macros/s/AKfycbwfBXkzbREIu-IvJtcDnKJtLoHGHdrUc_2X7aOokYXXq79joy9YXvSbZB01K7XvgEEg/exec";
+let productos = [];
 
-let productosGlobal = [];
+fetch(API_URL + "?action=productos")
+.then(r => r.json())
+.then(data => {
+  productos = data;
+  const cont = document.getElementById("productos");
+  cont.innerHTML = "";
 
-// Cargar productos desde Apps Script
-function cargarProductos() {
-  fetch(API_URL + "?action=productos")
-    .then(r => r.json())
-    .then(data => {
-      productosGlobal = data;
-      const cont = document.getElementById("productos");
-      cont.innerHTML = "";
-      let cats = {};
-      data.forEach((p,i) => {
-        if(!cats[p.categoria]) cats[p.categoria] = [];
-        cats[p.categoria].push({...p, id:i});
-      });
-      for(let c in cats){
-        cont.innerHTML += `<div class="categoria-titulo categoria-${c}">${c}</div>`;
-        cats[c].forEach(p => {
-          cont.innerHTML += `
-            <div class="producto-row">
-              <div class="producto-info"><strong>${p.nombre}</strong><br><small>${p.formato} - ${p.precio}</small></div>
-              <input type="number" min="0" step="${p.salto}" id="prod_${p.id}" value="0" onchange="calcularTotal()">
-            </div>`;
-        });
-      }
-    })
-    .catch(e => {
-      document.getElementById("productos").innerText = "Error cargando productos: " + e;
+  let categorias = {};
+  data.forEach((p,i)=>{
+    if(!categorias[p.categoria]) categorias[p.categoria] = [];
+    categorias[p.categoria].push({...p,id:i});
+  });
+
+  for (let cat in categorias){
+    cont.innerHTML += `<div class="categoria">${cat}</div>`;
+    categorias[cat].forEach(p=>{
+      cont.innerHTML += `
+        <div class="producto">
+          <div>${p.nombre}<br><small>${p.formato} - ${p.precio}</small></div>
+          <input type="number"
+                 id="p${p.id}"
+                 min="0"
+                 step="${p.salto}"
+                 value="0"
+                 onblur="validarMinimo(${p.id})"
+                 oninput="calcular()">
+        </div>`;
     });
+  }
+});
+
+function validarMinimo(id){
+  const input = document.getElementById("p"+id);
+  const p = productos[id];
+  let val = parseFloat(input.value) || 0;
+
+  if(val > 0 && val < p.minimo){
+    input.value = p.minimo;
+  }
+
+  // Ajustar al múltiplo del salto
+  val = parseFloat(input.value) || 0;
+  if(p.salto > 0){
+    input.value = (Math.round(val / p.salto) * p.salto).toFixed(2);
+  }
+
+  calcular();
 }
 
-function calcularTotal() {
-  let t = 0;
-  productosGlobal.forEach((p,i)=>{
-    let cant = parseFloat(document.getElementById("prod_" + i).value) || 0;
-    t += cant * p.precioNum;
+function calcular(){
+  let t=0;
+  productos.forEach((p,i)=>{
+    const c=parseFloat(document.getElementById("p"+i)?.value)||0;
+    t+=c*p.precioNum;
   });
-  document.getElementById("total").innerText = t.toFixed(2).replace(".",",") + " €";
-  return t.toFixed(2);
+  document.getElementById("total").innerText=t.toFixed(2)+" €";
 }
 
-function enviarPedido() {
-  const n = document.getElementById("nombre").value.trim();
-  const tel = document.getElementById("telefono").value.trim();
-  const btn = document.getElementById("btnEnviar");
-  
-  if(!n || !tel){ alert("Nombre y teléfono son obligatorios"); return; }
+function enviarPedido(){
+  const nombre=document.getElementById("nombre").value.trim();
+  const tel=document.getElementById("telefono").value.trim();
 
-  let sel = [];
-  let textoWhatsApp = `*Nuevo Pedido*\n*Cliente:* ${n}\n*Tel:* ${tel}\n----------\n`;
-  
-  productosGlobal.forEach((p,i)=>{
-    let cant = parseFloat(document.getElementById("prod_" + i).value) || 0;
-    if(cant>0){
-      sel.push({producto: p.nombre, formato: p.formato, cantidad: cant});
-      textoWhatsApp += `- ${cant}x ${p.nombre} (${p.formato})\n`;
-    }
+  if(!nombre || !tel){ alert("Completa nombre y teléfono"); return; }
+
+  let sel=[];
+  productos.forEach((p,i)=>{
+    const c=parseFloat(document.getElementById("p"+i).value)||0;
+    if(c>0) sel.push({producto:p.nombre, formato:p.formato, cantidad:c});
   });
 
-  if(sel.length === 0){ alert("No has seleccionado productos"); return; }
+  if(sel.length===0){ alert("No seleccionaste productos"); return; }
 
-  textoWhatsApp += `----------\n*Total: ${document.getElementById("total").innerText}*`;
-  btn.disabled = true;
-  btn.innerText = "Registrando...";
-
-  // Enviar pedido a Google Sheets
-  fetch(API_URL, {
+  fetch(API_URL,{
     method:"POST",
-    body: JSON.stringify({nombre:n, telefono:tel, productos:sel, total:calcularTotal(), hoja:"PEDIDOS"}),
+    body:JSON.stringify({nombre, telefono:tel, productos:sel, total:document.getElementById("total").innerText}),
     headers:{"Content-Type":"application/json"}
   })
   .then(r=>r.json())
   .then(()=>{
-    // Abrir WhatsApp
-    const url = "https://api.whatsapp.com/send?phone=" + MI_TELEFONO_RECEPCION + "&text=" + encodeURIComponent(textoWhatsApp);
-    document.body.innerHTML = `
-      <div style="text-align:center; padding:50px;">
-        <h2>¡Casi listo!</h2>
-        <p>Tu pedido se ha guardado en Google Sheets. Haz clic en el botón de abajo para enviarnos la confirmación por WhatsApp.</p>
-        <a href="${url}" target="_blank" style="background:#25D366; color:white; padding:15px 25px; text-decoration:none; border-radius:5px; font-weight:bold; display:inline-block; margin-top:20px;">
-          ENVIAR POR WHATSAPP
-        </a>
-      </div>`;
+    alert("✅ Pedido enviado correctamente");
+    location.reload();
   })
-  .catch(e=>{
-    alert("Error al enviar pedido: " + e);
-    btn.disabled=false;
-    btn.innerText="Enviar y Confirmar WhatsApp";
-  });
+  .catch(()=>alert("❌ Error enviando pedido"));
 }
-
-window.onload = cargarProductos;
 </script>
-</body>
-</html>
