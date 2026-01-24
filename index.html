@@ -1,5 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedido Online</title>
+
+<style>
+body { font-family: Arial; padding: 20px; background:#f9f9f9 }
+.categoria { margin-top:20px; font-weight:bold }
+.producto { display:flex; justify-content:space-between; margin-bottom:8px; background:#fff; padding:8px }
+input { width:70px; padding:6px; text-align:center }
+button { padding:14px; width:100%; background:#4caf50; color:#fff; border:none; font-size:16px }
+.total { margin-top:15px; font-size:18px }
+</style>
+</head>
+
+<body>
+
+<h2>Pedido Online</h2>
+
+<input type="text" id="nombre" placeholder="Nombre completo" style="width:100%; padding:10px; margin-bottom:8px">
+<input type="tel" id="telefono" placeholder="Teléfono" style="width:100%; padding:10px; margin-bottom:15px">
+
+<div id="productos">Cargando productos...</div>
+
+<div class="total">Total: <strong><span id="total">0.00 €</span></strong></div>
+<br>
+<button onclick="enviarPedido()">Enviar Pedido</button>
+
+<!-- 🔥 EL SCRIPT VA JUSTO ANTES DE CERRAR BODY -->
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwfBXkzbREIu-IvJtcDnKJtLoHGHdrUc_2X7aOokYXXq79joy9YXvSbZB01K7XvgEEg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwZsQGaRjuR4wLU3pncE1RkvRBunOAF8UxUQ-TRDaAxUq_LUaclygcPbKmwtV_HRMCJ/exec";
 let productos = [];
 
 fetch(API_URL + "?action=productos")
@@ -42,12 +73,10 @@ function validarMinimo(id){
   const p = productos[id];
   let val = parseFloat(input.value) || 0;
 
-  // Respetar mínimo
   if(val > 0 && val < p.minimo){
     val = p.minimo;
   }
 
-  // Ajustar al múltiplo del salto
   if(p.salto > 0){
     val = Math.round(val / p.salto) * p.salto;
   }
@@ -92,48 +121,6 @@ function enviarPedido(){
   .catch(()=>alert("❌ Error enviando pedido"));
 }
 </script>
-  // Ajustar al múltiplo del salto
-  val = parseFloat(input.value) || 0;
-  if(p.salto > 0){
-    input.value = (Math.round(val / p.salto) * p.salto).toFixed(2);
-  }
 
-  calcular();
-}
-
-function calcular(){
-  let t=0;
-  productos.forEach((p,i)=>{
-    const c=parseFloat(document.getElementById("p"+i)?.value)||0;
-    t+=c*p.precioNum;
-  });
-  document.getElementById("total").innerText=t.toFixed(2)+" €";
-}
-
-function enviarPedido(){
-  const nombre=document.getElementById("nombre").value.trim();
-  const tel=document.getElementById("telefono").value.trim();
-
-  if(!nombre || !tel){ alert("Completa nombre y teléfono"); return; }
-
-  let sel=[];
-  productos.forEach((p,i)=>{
-    const c=parseFloat(document.getElementById("p"+i).value)||0;
-    if(c>0) sel.push({producto:p.nombre, formato:p.formato, cantidad:c});
-  });
-
-  if(sel.length===0){ alert("No seleccionaste productos"); return; }
-
-  fetch(API_URL,{
-    method:"POST",
-    body:JSON.stringify({nombre, telefono:tel, productos:sel, total:document.getElementById("total").innerText}),
-    headers:{"Content-Type":"application/json"}
-  })
-  .then(r=>r.json())
-  .then(()=>{
-    alert("✅ Pedido enviado correctamente");
-    location.reload();
-  })
-  .catch(()=>alert("❌ Error enviando pedido"));
-}
-</script>
+</body>
+</html>
