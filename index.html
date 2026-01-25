@@ -36,27 +36,48 @@ fetch(API_URL + "?action=productos")
   mostrarProductos();
 });
 
+<script>
 function mostrarProductos(){
-  const cont = document.getElementById("productos");
-  let categorias = {};
+const cont = document.getElementById("productos");
+let categorias = {};
+cont.innerHTML = "";
 
-  productos.forEach((p,i)=>{
-    if(!categorias[p.categoria]) categorias[p.categoria]=[];
-    categorias[p.categoria].push({...p,id:i});
-  });
 
-  for(let cat in categorias){
-    cont.innerHTML += `<h2>${cat}</h2>`;
-    categorias[cat].forEach(p=>{
-      cont.innerHTML += `
-        <div class="producto">
-          <div>${p.nombre} (${p.formato}) - €${p.precio}</div>
-          <input type="number" min="0" step="${p.salto}" value="0"
-            onchange="cambiarCantidad(${p.id}, this.value)">
-        </div>`;
-    });
-  }
+productos.forEach((p,i)=>{
+if(!categorias[p.categoria]) categorias[p.categoria]=[];
+categorias[p.categoria].push({...p,id:i});
+});
+
+
+for(let cat in categorias){
+cont.innerHTML += `<h2>${cat}</h2>`;
+categorias[cat].forEach(p=>{
+
+
+// construir opciones del desplegable
+let opciones = `<option value="0">0</option>`;
+let valor = parseFloat(p.minimo);
+const salto = parseFloat(p.salto);
+const max = 4;
+
+
+while(valor <= max){
+opciones += `<option value="${valor}">${valor}</option>`;
+valor += salto;
 }
+
+
+cont.innerHTML += `
+<div class="producto">
+<div>${p.nombre} (${p.formato}) - €${p.precio}</div>
+<select onchange="cambiarCantidad(${p.id}, this.value)">
+${opciones}
+</select>
+</div>`;
+});
+}
+}
+</script>
 
 function cambiarCantidad(id, cantidad){
   const p = productos[id];
