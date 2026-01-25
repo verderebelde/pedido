@@ -6,39 +6,109 @@
 <title>Pedido Online</title>
 
 <style>
-body{font-family:Arial, sans-serif; background:#f2f2f2; padding:20px}
-h1{text-align:center}
-h2{margin-top:30px}
+body{
+  font-family:'Segoe UI', Arial, sans-serif;
+  background:linear-gradient(180deg,#eef3ff,#ffffff);
+  margin:0;
+  padding:15px 15px 120px 15px; /* espacio para barra inferior */
+  color:#333;
+}
+
+h1{
+  text-align:center;
+  margin:10px 0 15px 0;
+}
+
+.form-box{
+  background:white;
+  padding:15px;
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom:20px;
+}
+
+input{
+  padding:10px;
+  margin-bottom:12px;
+  width:100%;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+
+h2{
+  margin-top:25px;
+  border-left:5px solid #4a90e2;
+  padding-left:8px;
+}
+
 .producto{
   display:flex;
   justify-content:space-between;
   align-items:center;
   background:white;
-  padding:8px;
-  margin:5px 0;
-  border-radius:6px;
+  padding:12px;
+  margin:8px 0;
+  border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  font-size:15px;
 }
-select{padding:4px}
-input{padding:6px; margin-bottom:10px; width:250px}
-.total{font-size:22px; margin-top:20px; font-weight:bold}
+
+select{
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #bbb;
+  width:90px;
+  text-align:center;
+  font-weight:bold;
+  background:#f8f9ff;
+}
+
+/* 🔻 BARRA INFERIOR FIJA */
+.barra-total{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:white;
+  box-shadow:0 -4px 12px rgba(0,0,0,0.12);
+  padding:12px 15px 18px 15px;
+  border-top-left-radius:18px;
+  border-top-right-radius:18px;
+}
+
+.total-linea{
+  display:flex;
+  justify-content:space-between;
+  font-size:22px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
 button{
-  padding:12px 20px;
-  font-size:16px;
-  background:green;
+  width:100%;
+  padding:16px;
+  font-size:18px;
+  font-weight:bold;
+  background:linear-gradient(135deg,#28a745,#1e7e34);
   color:white;
   border:none;
-  border-radius:8px;
+  border-radius:12px;
   cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,0.15);
 }
-button:hover{background:#0a7d0a}
+
+button:active{
+  transform:scale(0.98);
+}
 </style>
 </head>
 
 <body>
 
-<h1>Hacer Pedido</h1>
+<h1>🛒 Hacer Pedido</h1>
 
-<div>
+<div class="form-box">
   <div>Nombre:</div>
   <input id="nombre" placeholder="Tu nombre">
   <div>Teléfono:</div>
@@ -47,15 +117,22 @@ button:hover{background:#0a7d0a}
 
 <div id="productos"></div>
 
-<div class="total">TOTAL: €<span id="total">0.00</span></div><br>
-<button onclick="enviarPedido()">ENVIAR PEDIDO</button>
+<!-- 🔻 BARRA FIJA -->
+<div class="barra-total">
+  <div class="total-linea">
+    <span>TOTAL</span>
+    <span>€<span id="total">0.00</span></span>
+  </div>
+  <button onclick="enviarPedido()">ENVIAR PEDIDO</button>
+</div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyNQw_E454FTdYKsxugWrJTtInlGeOzZH2xvLT4-YatKUb0aKDNz3gtqxyIUC45tCFD/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbz2BHKonlxkkXmsVuNVWhyRMPLgNPA2wjfFQp_dqEFdODeJIx-fD0W5wQy_gRGm_M-j/exec";
 
 let productos = [];
 let carrito = {};
 
+// 🔹 Cargar productos
 fetch(API_URL + "?action=productos")
 .then(r => r.json())
 .then(data => {
@@ -67,6 +144,7 @@ fetch(API_URL + "?action=productos")
   console.error(err);
 });
 
+// 🔹 Mostrar productos en pantalla
 function mostrarProductos(){
   const cont = document.getElementById("productos");
   cont.innerHTML = "";
@@ -80,10 +158,11 @@ function mostrarProductos(){
   for(let cat in categorias){
     cont.innerHTML += `<h2>${cat}</h2>`;
     categorias[cat].forEach(p=>{
+
       let opciones = `<option value="0">0</option>`;
       let valor = parseFloat(p.minimo);
       const salto = parseFloat(p.salto);
-      const max = 4;
+      const max = parseFloat(p.maximo);
 
       while(valor <= max){
         opciones += `<option value="${valor}">${valor}</option>`;
@@ -101,12 +180,14 @@ function mostrarProductos(){
   }
 }
 
+// 🔹 Cambiar cantidad
 function cambiarCantidad(id, cantidad){
   cantidad = parseFloat(cantidad) || 0;
   carrito[id] = cantidad;
   calcularTotal();
 }
 
+// 🔹 Calcular total
 function calcularTotal(){
   let total = 0;
   for(let id in carrito){
@@ -115,18 +196,13 @@ function calcularTotal(){
   document.getElementById("total").innerText = total.toFixed(2);
 }
 
+// 🔹 Enviar pedido
 function enviarPedido(){
   const nombre = document.getElementById("nombre").value.trim();
   const movil = document.getElementById("movil").value.trim();
 
-  if(!nombre){
-    alert("Por favor escribe tu nombre");
-    return;
-  }
-  if(!movil){
-    alert("Por favor escribe tu teléfono");
-    return;
-  }
+  if(!nombre){ alert("Por favor escribe tu nombre"); return; }
+  if(!movil){ alert("Por favor escribe tu teléfono"); return; }
 
   let resumen = "";
   let total = 0;
