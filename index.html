@@ -10,7 +10,7 @@ body{
   font-family:'Segoe UI', Arial, sans-serif;
   background:linear-gradient(180deg,#eef3ff,#ffffff);
   margin:0;
-  padding:15px 15px 120px 15px; /* espacio para barra inferior */
+  padding:15px 15px 120px 15px;
   color:#333;
 }
 
@@ -54,10 +54,6 @@ h2{
   font-size:15px;
 }
 
-.producto div:first-child{
-  flex:1;
-}
-
 select{
   padding:8px;
   border-radius:8px;
@@ -68,7 +64,6 @@ select{
   background:#f8f9ff;
 }
 
-/* 🔻 BARRA INFERIOR FIJA */
 .barra-total{
   position:fixed;
   bottom:0;
@@ -121,7 +116,6 @@ button:active{
 
 <div id="productos"></div>
 
-<!-- 🔻 BARRA FIJA -->
 <div class="barra-total">
   <div class="total-linea">
     <span>TOTAL</span>
@@ -131,7 +125,7 @@ button:active{
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbz2BHKonlxkkXmsVuNVWhyRMPLgNPA2wjfFQp_dqEFdODeJIx-fD0W5wQy_gRGm_M-j/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx1YTh9RZLeQRyNAuyZVgGTP5dirRIikD5-xf3E-pRKAsYujFh0__ZoU6Yt4QD70o-D/exec";
 
 let productos = [];
 let carrito = {};
@@ -172,10 +166,7 @@ function mostrarProductos(){
 
       cont.innerHTML += `
         <div class="producto">
-          <div>
-            ${p.nombre} (${p.formato}) - €${p.precio} 
-            <span id="subtotal-${p.id}">€0.00</span>
-          </div>
+          <div>${p.nombre} (${p.formato}) - €${p.precio.toFixed(2)}</div>
           <select onchange="cambiarCantidad(${p.id}, this.value)">
             ${opciones}
           </select>
@@ -187,11 +178,6 @@ function mostrarProductos(){
 function cambiarCantidad(id, cantidad){
   cantidad = parseFloat(cantidad) || 0;
   carrito[id] = cantidad;
-
-  // Actualizar subtotal del producto
-  const subtotal = cantidad * productos[id].precio;
-  document.getElementById(`subtotal-${id}`).innerText = "€" + subtotal.toFixed(2);
-
   calcularTotal();
 }
 
