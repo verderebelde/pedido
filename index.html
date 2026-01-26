@@ -10,7 +10,7 @@ body{
   font-family:'Segoe UI', Arial, sans-serif;
   background:linear-gradient(180deg,#eef3ff,#ffffff);
   margin:0;
-  padding:15px 15px 120px 15px;
+  padding:15px 15px 160px 15px;
   color:#333;
 }
 
@@ -43,7 +43,7 @@ input, textarea{
 }
 
 textarea{
-  min-height:90px;
+  min-height:80px;
   resize:vertical;
 }
 
@@ -75,6 +75,7 @@ select{
   background:#f8f9ff;
 }
 
+/* 🔽 BARRA TOTAL + BOTÓN */
 .barra-boton{
   position:fixed;
   bottom:0;
@@ -86,6 +87,13 @@ select{
   border-top-left-radius:18px;
   border-top-right-radius:18px;
   z-index:999;
+}
+
+.total{
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:10px;
 }
 
 button{
@@ -134,6 +142,7 @@ button:active{transform:scale(0.98);}
 </div>
 
 <div class="barra-boton">
+  <div class="total">Total: €<span id="total">0.00</span></div>
   <button id="btnEnviar" onclick="enviarPedido()">ENVIAR PEDIDO</button>
 </div>
 
@@ -192,6 +201,15 @@ function mostrarProductos(){
 
 function cambiarCantidad(id, cantidad){
   carrito[id] = parseFloat(cantidad) || 0;
+  actualizarTotal();
+}
+
+function actualizarTotal(){
+  let total = 0;
+  for(let id in carrito){
+    total += carrito[id] * productos[id].precio;
+  }
+  document.getElementById("total").innerText = total.toFixed(2);
 }
 
 function enviarPedido(){
@@ -206,8 +224,8 @@ function enviarPedido(){
   const movil = document.getElementById("movil").value.trim();
   const observaciones = document.getElementById("observaciones").value.trim();
 
-  if(!nombre){ alert("Escribe tu nombre"); resetBoton(); return; }
-  if(!movil){ alert("Escribe tu teléfono"); resetBoton(); return; }
+  if(!nombre){ alert("Por favor escribe tu nombre"); resetBoton(); return; }
+  if(!movil){ alert("Por favor escribe tu teléfono"); resetBoton(); return; }
 
   let resumen = "";
   let total = 0;
@@ -221,7 +239,7 @@ function enviarPedido(){
   }
 
   if(total === 0){
-    alert("No has añadido productos");
+    alert("No has añadido productos al pedido");
     resetBoton();
     return;
   }
@@ -240,8 +258,6 @@ function enviarPedido(){
   .then(() => {
     document.body.innerHTML = `
       <h1>✅ GRACIAS POR TU PEDIDO</h1>
-      <p><strong>Nombre:</strong> ${nombre}</p>
-      <p><strong>Teléfono:</strong> ${movil}</p>
       <pre>${resumen}</pre>
       <p><strong>Observaciones:</strong><br>${observaciones || "—"}</p>
       <h2>Total €${total.toFixed(2)}</h2>
