@@ -70,7 +70,8 @@ select{
   background:#f8f9ff;
 }
 
-.barra-total{
+/* 🔽 BARRA SOLO BOTÓN */
+.barra-boton{
   position:fixed;
   bottom:0;
   left:0;
@@ -80,14 +81,7 @@ select{
   padding:12px 15px 18px 15px;
   border-top-left-radius:18px;
   border-top-right-radius:18px;
-}
-
-.total-linea{
-  display:flex;
-  justify-content:space-between;
-  font-size:22px;
-  font-weight:bold;
-  margin-bottom:10px;
+  z-index:999;
 }
 
 button{
@@ -101,6 +95,11 @@ button{
   border-radius:12px;
   cursor:pointer;
   box-shadow:0 4px 10px rgba(0,0,0,0.15);
+}
+
+button:disabled{
+  opacity:0.7;
+  cursor:not-allowed;
 }
 
 button:active{transform:scale(0.98);}
@@ -124,12 +123,8 @@ button:active{transform:scale(0.98);}
 
 <div id="productos"></div>
 
-<div class="barra-total">
-  <div class="total-linea">
-    <span>TOTAL</span>
-    <span>€<span id="total">0.00</span></span>
-  </div>
-  <button onclick="enviarPedido()">ENVIAR PEDIDO</button>
+<div class="barra-boton">
+  <button id="btnEnviar" onclick="enviarPedido()">ENVIAR PEDIDO</button>
 </div>
 
 <script>
@@ -137,6 +132,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx3M3C7a5SZP5Vl9jrpMXta
 
 let productos = [];
 let carrito = {};
+let enviando = false;
 
 fetch(API_URL + "?action=productos")
 .then(r => r.json())
@@ -187,23 +183,21 @@ function mostrarProductos(){
 function cambiarCantidad(id, cantidad){
   cantidad = parseFloat(cantidad) || 0;
   carrito[id] = cantidad;
-  calcularTotal();
-}
-
-function calcularTotal(){
-  let total = 0;
-  for(let id in carrito){
-    total += carrito[id] * productos[id].precio;
-  }
-  document.getElementById("total").innerText = total.toFixed(2);
 }
 
 function enviarPedido(){
+  if(enviando) return;
+
+  const btn = document.getElementById("btnEnviar");
+  btn.disabled = true;
+  btn.innerText = "ENVIANDO...";
+  enviando = true;
+
   const nombre = document.getElementById("nombre").value.trim();
   const movil = document.getElementById("movil").value.trim();
 
-  if(!nombre){ alert("Por favor escribe tu nombre"); return; }
-  if(!movil){ alert("Por favor escribe tu teléfono"); return; }
+  if(!nombre){ alert("Por favor escribe tu nombre"); resetBoton(); return; }
+  if(!movil){ alert("Por favor escribe tu teléfono"); resetBoton(); return; }
 
   let resumen = "";
   let total = 0;
@@ -218,6 +212,7 @@ function enviarPedido(){
 
   if(total === 0){
     alert("No has añadido productos al pedido");
+    resetBoton();
     return;
   }
 
@@ -238,7 +233,15 @@ function enviarPedido(){
   .catch(err=>{
     alert("Error enviando pedido");
     console.error(err);
+    resetBoton();
   });
+}
+
+function resetBoton(){
+  const btn = document.getElementById("btnEnviar");
+  btn.disabled = false;
+  btn.innerText = "ENVIAR PEDIDO";
+  enviando = false;
 }
 </script>
 
