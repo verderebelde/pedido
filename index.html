@@ -1,3 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedido Online</title>
+
+<style>
+body{
+  font-family:'Segoe UI', Arial, sans-serif;
+  background:linear-gradient(180deg,#eef3ff,#ffffff);
+  margin:0;
+  padding:15px 15px 160px 15px;
+  color:#333;
+}
+
+.logo{
+  text-align:center;
+  margin:5px 0 15px 0;
+}
+.logo img{
+  max-width:160px;
+  height:auto;
+}
+
+h1{text-align:center;margin:10px 0 15px 0;}
+
+.form-box{
+  background:white;
+  padding:15px;
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom:20px;
+}
+
+label{
+  font-weight:600;
+}
+
+.req{
+  color:red;
+  font-size:12px;
+  margin-left:4px;
+}
+
+input, textarea{
+  padding:10px;
+  margin-bottom:12px;
+  width:100%;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+
+textarea{
+  min-height:80px;
+  resize:vertical;
+}
+
+h2{
+  margin-top:25px;
+  border-left:5px solid #4a90e2;
+  padding-left:8px;
+}
+
+.producto{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:white;
+  padding:12px;
+  margin:8px 0;
+  border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  font-size:15px;
+}
+
+select{
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #bbb;
+  width:90px;
+  text-align:center;
+  font-weight:bold;
+  background:#f8f9ff;
+}
+
+/* 🔽 BARRA TOTAL + BOTÓN */
+.barra-boton{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:white;
+  box-shadow:0 -4px 12px rgba(0,0,0,0.12);
+  padding:12px 15px 18px 15px;
+  border-top-left-radius:18px;
+  border-top-right-radius:18px;
+  z-index:999;
+}
+
+.total{
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+button{
+  width:100%;
+  padding:16px;
+  font-size:18px;
+  font-weight:bold;
+  background:linear-gradient(135deg,#28a745,#1e7e34);
+  color:white;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,0.15);
+}
+
+button:disabled{
+  opacity:0.7;
+  cursor:not-allowed;
+}
+
+button:active{transform:scale(0.98);}
+</style>
+</head>
+
+<body>
+
+<div class="logo">
+  <img src="https://lh3.googleusercontent.com/d/1p5CySNTWSX8fl02aYOr1VVRlTWLSZI-e" alt="Logo">
+</div>
+
+<h1>🛒 Hacer Pedido</h1>
+
+<div class="form-box">
+  <label>Nombre<span class="req">*</span></label>
+  <input id="nombre" autocomplete="off">
+
+  <label>Teléfono<span class="req">*</span></label>
+  <input id="movil" inputmode="numeric" autocomplete="off"
+         oninput="this.value=this.value.replace(/\s+/g,'')">
+</div>
+
+<div id="productos"></div>
+
+<div class="form-box">
+  <label>Observaciones</label>
+  <textarea id="observaciones"></textarea>
+</div>
+
+<div class="barra-boton">
+  <div class="total">Total: €<span id="total">0.00</span></div>
+  <button id="btnEnviar" onclick="enviarPedido()">ENVIAR PEDIDO</button>
+</div>
+
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycby6GuCSfmN6d4IyzfuZx8YnLN7sXpEK9BJDWmiPNAY5SrRK_mpisl2GuiWvU0c4eZ6W/exec";
 
@@ -10,10 +169,6 @@ fetch(API_URL + "?action=productos")
 .then(data => {
   productos = data;
   mostrarProductos();
-})
-.catch(err => {
-  document.getElementById("productos").innerHTML = "Error cargando productos";
-  console.error(err);
 });
 
 function mostrarProductos(){
@@ -39,7 +194,7 @@ function mostrarProductos(){
       cont.innerHTML += `
         <div class="producto">
           <div>${p.nombre} (${p.formato}) - €${p.precio}</div>
-          <select onchange="cambiarCantidad(${p.id}, this.value)">
+          <select onchange="cambiarCantidad(${p.id},this.value)">
             ${opciones}
           </select>
         </div>`;
@@ -47,15 +202,11 @@ function mostrarProductos(){
   }
 }
 
-function cambiarCantidad(id, cantidad){
-  carrito[id] = parseFloat(cantidad) || 0;
-  actualizarTotal();
-}
-
-function actualizarTotal(){
+function cambiarCantidad(id,c){
+  carrito[id] = parseFloat(c) || 0;
   let total = 0;
-  for(let id in carrito){
-    total += carrito[id] * productos[id].precio;
+  for(let i in carrito){
+    total += carrito[i] * productos[i].precio;
   }
   document.getElementById("total").innerText = total.toFixed(2);
 }
@@ -63,77 +214,30 @@ function actualizarTotal(){
 function enviarPedido(){
   if(enviando) return;
 
-  const btn = document.getElementById("btnEnviar");
-  btn.disabled = true;
-  btn.innerText = "ENVIANDO...";
-  enviando = true;
+  const nombre = nombreEl().value.trim();
+  const movil = movilEl().value.trim();
+  const obs = document.getElementById("observaciones").value.trim();
 
-  const nombre = document.getElementById("nombre").value.trim();
-  const movil = document.getElementById("movil").value.trim();
-  const observaciones = document.getElementById("observaciones").value.trim();
+  if(!nombre){ alert("Nombre obligatorio"); return; }
+  if(!movil){ alert("Teléfono obligatorio"); return; }
 
-  if(!nombre){
-    alert("Nombre obligatorio");
-    resetBoton();
-    return;
-  }
-  if(!movil){
-    alert("Teléfono obligatorio");
-    resetBoton();
-    return;
-  }
-
-  let resumen = "";
-  let total = 0;
-
-  for(let id in carrito){
-    if(carrito[id] > 0){
-      const p = productos[id];
-      resumen += `${carrito[id]} x ${p.nombre} (${p.formato}) - €${(carrito[id]*p.precio).toFixed(2)}\n`;
-      total += carrito[id] * p.precio;
+  let resumen="", total=0;
+  for(let i in carrito){
+    if(carrito[i]>0){
+      resumen += `${carrito[i]} x ${productos[i].nombre}\n`;
+      total += carrito[i]*productos[i].precio;
     }
-  }
-
-  if(total === 0){
-    alert("No has añadido productos al pedido");
-    resetBoton();
-    return;
   }
 
   fetch(API_URL,{
     method:"POST",
-    body: JSON.stringify({
-      nombre,
-      movil,
-      pedido: resumen,
-      total,
-      observaciones
-    })
-  })
-  .then(r => r.json())
-  .then(() => {
-    document.body.innerHTML = `
-      <div style="padding:20px; font-family:'Segoe UI',Arial,sans-serif;">
-        <h1>✅ PEDIDO ENVIADO</h1>
-        <p><strong>Nombre:</strong> ${nombre}</p>
-        <p><strong>Teléfono:</strong> ${movil}</p>
-        <pre style="background:#f6f6f6;padding:12px;border-radius:8px;">${resumen}</pre>
-        <p><strong>Observaciones:</strong><br>${observaciones || "—"}</p>
-        <h2>Total €${total.toFixed(2)}</h2>
-      </div>
-    `;
-  })
-  .catch(err=>{
-    alert("Error enviando pedido");
-    console.error(err);
-    resetBoton();
-  });
+    body:JSON.stringify({nombre,movil,pedido:resumen,total,observaciones:obs})
+  }).then(()=>alert("Pedido enviado ✔️"));
 }
 
-function resetBoton(){
-  const btn = document.getElementById("btnEnviar");
-  btn.disabled = false;
-  btn.innerText = "ENVIAR PEDIDO";
-  enviando = false;
-}
+function nombreEl(){ return document.getElementById("nombre"); }
+function movilEl(){ return document.getElementById("movil"); }
 </script>
+
+</body>
+</html>
