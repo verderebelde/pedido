@@ -33,13 +33,18 @@ h1{text-align:center;margin:10px 0 15px 0;}
   margin-bottom:20px;
 }
 
-input{
+input, textarea{
   padding:10px;
   margin-bottom:12px;
   width:100%;
   border-radius:8px;
   border:1px solid #ccc;
   font-size:16px;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
 }
 
 h2{
@@ -70,7 +75,6 @@ select{
   background:#f8f9ff;
 }
 
-/* 🔽 BARRA SOLO BOTÓN */
 .barra-boton{
   position:fixed;
   bottom:0;
@@ -117,11 +121,17 @@ button:active{transform:scale(0.98);}
 <div class="form-box">
   <div>Nombre:</div>
   <input id="nombre" placeholder="Tu nombre">
+
   <div>Teléfono:</div>
   <input id="movil" placeholder="Tu teléfono">
 </div>
 
 <div id="productos"></div>
+
+<div class="form-box">
+  <div>Observaciones:</div>
+  <textarea id="observaciones" placeholder="Notas para tu pedido (horarios, cambios, etc.)"></textarea>
+</div>
 
 <div class="barra-boton">
   <button id="btnEnviar" onclick="enviarPedido()">ENVIAR PEDIDO</button>
@@ -181,8 +191,7 @@ function mostrarProductos(){
 }
 
 function cambiarCantidad(id, cantidad){
-  cantidad = parseFloat(cantidad) || 0;
-  carrito[id] = cantidad;
+  carrito[id] = parseFloat(cantidad) || 0;
 }
 
 function enviarPedido(){
@@ -195,9 +204,10 @@ function enviarPedido(){
 
   const nombre = document.getElementById("nombre").value.trim();
   const movil = document.getElementById("movil").value.trim();
+  const observaciones = document.getElementById("observaciones").value.trim();
 
-  if(!nombre){ alert("Por favor escribe tu nombre"); resetBoton(); return; }
-  if(!movil){ alert("Por favor escribe tu teléfono"); resetBoton(); return; }
+  if(!nombre){ alert("Escribe tu nombre"); resetBoton(); return; }
+  if(!movil){ alert("Escribe tu teléfono"); resetBoton(); return; }
 
   let resumen = "";
   let total = 0;
@@ -211,14 +221,20 @@ function enviarPedido(){
   }
 
   if(total === 0){
-    alert("No has añadido productos al pedido");
+    alert("No has añadido productos");
     resetBoton();
     return;
   }
 
   fetch(API_URL,{
     method:"POST",
-    body: JSON.stringify({nombre, movil, pedido: resumen, total})
+    body: JSON.stringify({
+      nombre,
+      movil,
+      pedido: resumen,
+      total,
+      observaciones
+    })
   })
   .then(r => r.json())
   .then(() => {
@@ -227,6 +243,7 @@ function enviarPedido(){
       <p><strong>Nombre:</strong> ${nombre}</p>
       <p><strong>Teléfono:</strong> ${movil}</p>
       <pre>${resumen}</pre>
+      <p><strong>Observaciones:</strong><br>${observaciones || "—"}</p>
       <h2>Total €${total.toFixed(2)}</h2>
     `;
   })
