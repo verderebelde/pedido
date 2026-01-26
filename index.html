@@ -33,6 +33,16 @@ h1{text-align:center;margin:10px 0 15px 0;}
   margin-bottom:20px;
 }
 
+label{
+  font-weight:600;
+}
+
+.req{
+  color:red;
+  font-size:12px;
+  margin-left:4px;
+}
+
 input, textarea{
   padding:10px;
   margin-bottom:12px;
@@ -127,18 +137,19 @@ button:active{transform:scale(0.98);}
 <h1>🛒 Hacer Pedido</h1>
 
 <div class="form-box">
-  <div>Nombre:</div>
-  <input id="nombre" placeholder="Tu nombre">
+  <label>Nombre<span class="req">*</span></label>
+  <input id="nombre" autocomplete="off">
 
-  <div>Teléfono:</div>
-  <input id="movil" placeholder="Tu teléfono">
+  <label>Teléfono<span class="req">*</span></label>
+  <input id="movil" inputmode="numeric" autocomplete="off"
+         oninput="this.value=this.value.replace(/\s+/g,'')">
 </div>
 
 <div id="productos"></div>
 
 <div class="form-box">
-  <div>Observaciones:</div>
-  <textarea id="observaciones" placeholder="Notas para tu pedido (horarios, cambios, etc.)"></textarea>
+  <label>Observaciones</label>
+  <textarea id="observaciones"></textarea>
 </div>
 
 <div class="barra-boton">
@@ -158,10 +169,6 @@ fetch(API_URL + "?action=productos")
 .then(data => {
   productos = data;
   mostrarProductos();
-})
-.catch(err => {
-  document.getElementById("productos").innerHTML = "Error cargando productos";
-  console.error(err);
 });
 
 function mostrarProductos(){
@@ -177,21 +184,17 @@ function mostrarProductos(){
   for(let cat in categorias){
     cont.innerHTML += `<h2>${cat}</h2>`;
     categorias[cat].forEach(p=>{
-
       let opciones = `<option value="0">0</option>`;
-      let valor = parseFloat(p.minimo);
-      const salto = parseFloat(p.salto);
-      const max = parseFloat(p.maximo);
-
-      while(valor <= max){
-        opciones += `<option value="${valor}">${valor}</option>`;
-        valor += salto;
+      let v = parseFloat(p.minimo);
+      while(v <= p.maximo){
+        opciones += `<option value="${v}">${v}</option>`;
+        v += p.salto;
       }
 
       cont.innerHTML += `
         <div class="producto">
           <div>${p.nombre} (${p.formato}) - €${p.precio}</div>
-          <select onchange="cambiarCantidad(${p.id}, this.value)">
+          <select onchange="cambiarCantidad(${p.id},this.value)">
             ${opciones}
           </select>
         </div>`;
@@ -199,15 +202,11 @@ function mostrarProductos(){
   }
 }
 
-function cambiarCantidad(id, cantidad){
-  carrito[id] = parseFloat(cantidad) || 0;
-  actualizarTotal();
-}
-
-function actualizarTotal(){
+function cambiarCantidad(id,c){
+  carrito[id] = parseFloat(c) || 0;
   let total = 0;
-  for(let id in carrito){
-    total += carrito[id] * productos[id].precio;
+  for(let i in carrito){
+    total += carrito[i] * productos[i].precio;
   }
   document.getElementById("total").innerText = total.toFixed(2);
 }
@@ -215,67 +214,29 @@ function actualizarTotal(){
 function enviarPedido(){
   if(enviando) return;
 
-  const btn = document.getElementById("btnEnviar");
-  btn.disabled = true;
-  btn.innerText = "ENVIANDO...";
-  enviando = true;
+  const nombre = nombreEl().value.trim();
+  const movil = movilEl().value.trim();
+  const obs = document.getElementById("observaciones").value.trim();
 
-  const nombre = document.getElementById("nombre").value.trim();
-  const movil = document.getElementById("movil").value.trim();
-  const observaciones = document.getElementById("observaciones").value.trim();
+  if(!nombre){ alert("Nombre obligatorio"); return; }
+  if(!movil){ alert("Teléfono obligatorio"); return; }
 
-  if(!nombre){ alert("Por favor escribe tu nombre"); resetBoton(); return; }
-  if(!movil){ alert("Por favor escribe tu teléfono"); resetBoton(); return; }
-
-  let resumen = "";
-  let total = 0;
-
-  for(let id in carrito){
-    if(carrito[id] > 0){
-      let p = productos[id];
-      resumen += `${carrito[id]} x ${p.nombre} (${p.formato}) - €${(carrito[id]*p.precio).toFixed(2)}\n`;
-      total += carrito[id] * p.precio;
+  let resumen="", total=0;
+  for(let i in carrito){
+    if(carrito[i]>0){
+      resumen += `${carrito[i]} x ${productos[i].nombre}\n`;
+      total += carrito[i]*productos[i].precio;
     }
-  }
-
-  if(total === 0){
-    alert("No has añadido productos al pedido");
-    resetBoton();
-    return;
   }
 
   fetch(API_URL,{
     method:"POST",
-    body: JSON.stringify({
-      nombre,
-      movil,
-      pedido: resumen,
-      total,
-      observaciones
-    })
-  })
-  .then(r => r.json())
-  .then(() => {
-    document.body.innerHTML = `
-      <h1>✅ GRACIAS POR TU PEDIDO</h1>
-      <pre>${resumen}</pre>
-      <p><strong>Observaciones:</strong><br>${observaciones || "—"}</p>
-      <h2>Total €${total.toFixed(2)}</h2>
-    `;
-  })
-  .catch(err=>{
-    alert("Error enviando pedido");
-    console.error(err);
-    resetBoton();
-  });
+    body:JSON.stringify({nombre,movil,pedido:resumen,total,observaciones:obs})
+  }).then(()=>alert("Pedido enviado ✔️"));
 }
 
-function resetBoton(){
-  const btn = document.getElementById("btnEnviar");
-  btn.disabled = false;
-  btn.innerText = "ENVIAR PEDIDO";
-  enviando = false;
-}
+function nombreEl(){ return document.getElementById("nombre"); }
+function movilEl(){ return document.getElementById("movil"); }
 </script>
 
 </body>
