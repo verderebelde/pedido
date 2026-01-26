@@ -5,43 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pedido Online</title>
 
-<!-- 🌿 Fuente más bonita -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 body{
-  font-family:'Poppins', sans-serif;
+  font-family:'Montserrat', sans-serif;
   margin:0;
   padding:15px 15px 160px 15px;
   color:#2f3e2f;
-  background:linear-gradient(180deg,#f1f8f4,#ffffff);
+  background:linear-gradient(180deg,#f4fbf6,#ffffff);
   position:relative;
+  overflow-x:hidden;
 }
 
-/* 🌿 Fondo vegetal sutil */
 body::before{
   content:"";
   position:fixed;
   inset:0;
-  background-image:url("https://www.transparenttextures.com/patterns/leaf.png");
-  opacity:0.05;
+  background-image:url("https://www.svgrepo.com/show/530450/leaf-pattern.svg");
+  background-size:600px;
+  background-repeat:repeat;
+  opacity:0.04;
   z-index:-1;
 }
 
-.logo{
-  text-align:center;
-  margin:10px 0 10px 0;
-}
-.logo img{
-  max-width:170px;
-  height:auto;
-}
+.logo{text-align:center;margin:10px 0;}
+.logo img{max-width:170px;height:auto;}
 
-h1{
-  text-align:center;
-  margin:10px 0 20px 0;
-  color:#2e7d32;
-}
+h1{text-align:center;margin:10px 0 20px 0;color:#2e7d32;font-weight:600;}
 
 .form-box{
   background:white;
@@ -61,16 +52,14 @@ input, textarea{
   background:#f9fdf9;
 }
 
-textarea{
-  min-height:90px;
-  resize:vertical;
-}
+textarea{min-height:90px;resize:vertical;}
 
 h2{
   margin-top:28px;
   border-left:6px solid #66bb6a;
   padding-left:10px;
   color:#2e7d32;
+  font-weight:600;
 }
 
 .producto{
@@ -95,13 +84,8 @@ select{
   background:#f1f8f1;
 }
 
-.req{
-  color:#c62828;
-  font-size:12px;
-  margin-left:4px;
-}
+.req{color:#c62828;font-size:12px;margin-left:4px;}
 
-/* 🔽 Barra inferior */
 .barra-boton{
   position:fixed;
   bottom:0;
@@ -136,17 +120,35 @@ button{
   transition:all 0.2s ease;
 }
 
-button:hover{
-  transform:translateY(-2px);
-  box-shadow:0 8px 18px rgba(46,125,50,0.35);
-}
-
-button:disabled{
-  opacity:0.6;
-  cursor:not-allowed;
-}
-
+button:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(46,125,50,0.35);}
+button:disabled{opacity:0.6;cursor:not-allowed;}
 button:active{transform:scale(0.98);}
+
+/* 🌿 Tarjeta final */
+.gracias-card{
+  max-width:600px;
+  margin:40px auto;
+  background:white;
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+  text-align:center;
+  animation:fadeIn 0.6s ease;
+}
+
+.gracias-card h1{color:#2e7d32;margin-bottom:10px;}
+.gracias-card pre{
+  text-align:left;
+  background:#f1f8f1;
+  padding:15px;
+  border-radius:10px;
+  white-space:pre-wrap;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
 </style>
 </head>
 
@@ -188,10 +190,7 @@ let enviando = false;
 fetch(API_URL + "?action=productos")
 .then(r => r.json())
 .then(data => { productos = data; mostrarProductos(); })
-.catch(err => {
-  document.getElementById("productos").innerHTML = "Error cargando productos";
-  console.error(err);
-});
+.catch(err => { document.getElementById("productos").innerHTML = "Error cargando productos"; });
 
 function mostrarProductos(){
   const cont = document.getElementById("productos");
@@ -219,9 +218,7 @@ function mostrarProductos(){
       cont.innerHTML += `
         <div class="producto">
           <div>${p.nombre} (${p.formato}) - €${p.precio}</div>
-          <select onchange="cambiarCantidad(${p.id}, this.value)">
-            ${opciones}
-          </select>
+          <select onchange="cambiarCantidad(${p.id}, this.value)">${opciones}</select>
         </div>`;
     });
   }
@@ -234,9 +231,7 @@ function cambiarCantidad(id, cantidad){
 
 function actualizarTotal(){
   let total = 0;
-  for(let id in carrito){
-    total += carrito[id] * productos[id].precio;
-  }
+  for(let id in carrito){ total += carrito[id] * productos[id].precio; }
   document.getElementById("total").innerText = total.toFixed(2);
 }
 
@@ -265,11 +260,7 @@ function enviarPedido(){
     }
   }
 
-  if(total === 0){
-    alert("No has añadido productos al pedido");
-    resetBoton();
-    return;
-  }
+  if(total === 0){ alert("No has añadido productos al pedido"); resetBoton(); return; }
 
   fetch(API_URL,{
     method:"POST",
@@ -278,15 +269,17 @@ function enviarPedido(){
   .then(r => r.json())
   .then(() => {
     document.body.innerHTML = `
-      <h1>✅ GRACIAS POR TU PEDIDO</h1>
-      <pre>${resumen}</pre>
-      <p><strong>Observaciones:</strong><br>${observaciones || "—"}</p>
-      <h2>Total €${total.toFixed(2)}</h2>
+      <div class="gracias-card">
+        <h1>✅ ¡Gracias por tu pedido!</h1>
+        <p>Hemos recibido tu solicitud correctamente 🌿</p>
+        <pre>${resumen}</pre>
+        <p><strong>Observaciones:</strong><br>${observaciones || "—"}</p>
+        <h2>Total €${total.toFixed(2)}</h2>
+      </div>
     `;
   })
   .catch(err=>{
     alert("Error enviando pedido");
-    console.error(err);
     resetBoton();
   });
 }
