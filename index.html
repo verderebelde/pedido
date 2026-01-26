@@ -75,6 +75,13 @@ select{
   background:#f8f9ff;
 }
 
+/* 🔴 CAMBIO: asterisco rojo y pequeño */
+.req{
+  color:#d60000;
+  font-size:12px;
+  margin-left:4px;
+}
+
 /* 🔽 BARRA TOTAL + BOTÓN */
 .barra-boton{
   position:fixed;
@@ -127,18 +134,18 @@ button:active{transform:scale(0.98);}
 <h1>🛒 Hacer Pedido</h1>
 
 <div class="form-box">
-  <div>Nombre:</div>
+  <div>Nombre <span class="req">*</span></div> <!-- 🔴 CAMBIO -->
   <input id="nombre" placeholder="Tu nombre">
 
-  <div>Teléfono:</div>
-  <input id="movil" placeholder="Tu teléfono">
+  <div>Teléfono <span class="req">*</span></div> <!-- 🔴 CAMBIO -->
+  <input id="movil" placeholder="Tu teléfono" oninput="this.value=this.value.replace(/\s/g,'')"> <!-- 🔴 CAMBIO -->
 </div>
 
 <div id="productos"></div>
 
 <div class="form-box">
   <div>Observaciones:</div>
-  <textarea id="observaciones" placeholder="Notas para tu pedido (horarios, cambios, etc.)"></textarea>
+  <textarea id="observaciones"></textarea> <!-- 🔴 CAMBIO: sin placeholder -->
 </div>
 
 <div class="barra-boton">
@@ -280,4 +287,3 @@ function resetBoton(){
 
 </body>
 </html>
- 
