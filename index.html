@@ -124,7 +124,6 @@ button:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(46,125,50,0.3
 button:disabled{opacity:0.6;cursor:not-allowed;}
 button:active{transform:scale(0.98);}
 
-/* 🌿 Tarjeta final */
 .gracias-card{
   max-width:600px;
   margin:40px auto;
@@ -171,6 +170,11 @@ button:active{transform:scale(0.98);}
 <div id="productos"></div>
 
 <div class="form-box">
+  <div style="font-size:13px; color:#2e7d32; margin-bottom:10px; line-height:1.4;">
+    <strong>* Se pide por unidad, se cobra por kg</strong><br>
+    <strong>** No suma para los pedidos con mínimo</strong>
+  </div>
+
   <div>Observaciones:</div>
   <textarea id="observaciones"></textarea>
 </div>
@@ -217,7 +221,12 @@ function mostrarProductos(){
 
       cont.innerHTML += `
         <div class="producto">
-          <div>${p.nombre} (${p.formato}) - €${p.precio}</div>
+          <div style="
+            font-weight:${p.estilo?.negrita ? '700' : '400'};
+            color:${p.estilo?.color || '#2f3e2f'};
+          ">
+            ${p.nombre} (${p.formato}) - €${p.precio}
+          </div>
           <select onchange="cambiarCantidad(${p.id}, this.value)">${opciones}</select>
         </div>`;
     });
