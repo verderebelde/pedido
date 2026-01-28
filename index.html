@@ -18,20 +18,19 @@ body{
   overflow-x:hidden;
 }
 
-/* 🌿 Fondo con LOGO + patrón vegetal */
 body::before{
   content:"";
   position:fixed;
   inset:0;
-  background-image:
-    url("https://lh3.googleusercontent.com/d/1p5CySNTWSX8fl02aYOr1VVRlTWLSZI-e"),
-    url("https://www.svgrepo.com/show/530450/leaf-pattern.svg");
-  background-repeat:no-repeat, repeat;
-  background-position:center center, center;
-  background-size:420px, 600px;
-  opacity:0.06;
+  background-image:url("https://www.svgrepo.com/show/530450/leaf-pattern.svg");
+  background-size:600px;
+  background-repeat:repeat;
+  opacity:0.04;
   z-index:-1;
 }
+
+.logo{text-align:center;margin:10px 0;}
+.logo img{max-width:170px;height:auto;}
 
 h1{text-align:center;margin:10px 0 20px 0;color:#2e7d32;font-weight:600;}
 
@@ -153,6 +152,10 @@ button:active{transform:scale(0.98);}
 </head>
 
 <body>
+
+<div class="logo">
+  <img src="https://lh3.googleusercontent.com/d/1p5CySNTWSX8fl02aYOr1VVRlTWLSZI-e" alt="Logo">
+</div>
 
 <h1>🛒 Hacer Pedido</h1>
 
