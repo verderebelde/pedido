@@ -164,7 +164,14 @@ button:active{transform:scale(0.98);}
   <input id="nombre" placeholder="Tu nombre">
 
   <div>Teléfono <span class="req">*</span></div>
-  <input id="movil" placeholder="Tu teléfono" oninput="this.value=this.value.replace(/\s/g,'')">
+ <input 
+  id="movil" 
+  placeholder="Tu teléfono" 
+  inputmode="numeric" 
+  pattern="[0-9]*"
+  oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+>
+
 </div>
 
 <div id="productos"></div>
