@@ -14,7 +14,6 @@ body{
   padding:15px 15px 160px 15px;
   color:#2f3e2f;
   background:linear-gradient(180deg,#f4fbf6,#ffffff);
-  position:relative;
   overflow-x:hidden;
 }
 
@@ -24,42 +23,44 @@ body::before{
   inset:0;
   background-image:url("https://www.svgrepo.com/show/530450/leaf-pattern.svg");
   background-size:600px;
-  background-repeat:repeat;
   opacity:0.04;
   z-index:-1;
 }
 
-.logo{text-align:center;margin:10px 0;}
-.logo img{max-width:170px;height:auto;}
+/* ===================== */
+/* ESTRUCTURA */
+/* ===================== */
+.layout{max-width:100%;}
+.grid{display:block;}
 
-h1{text-align:center;margin:10px 0 20px 0;color:#2e7d32;font-weight:600;}
+.logo{text-align:center;margin:10px 0;}
+.logo img{max-width:170px;}
+
+h1{text-align:center;color:#2e7d32;}
 
 .form-box{
   background:white;
   padding:18px;
   border-radius:16px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.06);
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
   margin-bottom:18px;
 }
 
 input, textarea{
+  width:100%;
   padding:12px;
   margin-bottom:12px;
-  width:100%;
   border-radius:10px;
   border:1px solid #d7e5d7;
-  font-size:15px;
   background:#f9fdf9;
 }
 
-textarea{min-height:90px;resize:vertical;}
+textarea{min-height:90px;}
 
 h2{
-  margin-top:28px;
   border-left:6px solid #66bb6a;
   padding-left:10px;
   color:#2e7d32;
-  font-weight:600;
 }
 
 .producto{
@@ -70,41 +71,64 @@ h2{
   padding:14px;
   margin:10px 0;
   border-radius:14px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.05);
-  font-size:14px;
+  box-shadow:0 3px 10px rgba(0,0,0,.05);
 }
 
 select{
+  width:90px;
   padding:8px;
   border-radius:8px;
-  border:1px solid #c8d6c8;
-  width:90px;
-  text-align:center;
-  font-weight:600;
   background:#f1f8f1;
 }
 
-.req{color:#c62828;font-size:12px;margin-left:4px;}
+.req{color:#c62828;font-size:12px}
 
+/* ===================== */
+/* RESUMEN */
+/* ===================== */
+.resumen{
+  display:none;
+  background:white;
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+  position:sticky;
+  top:20px;
+  height:fit-content;
+}
+
+.resumen h3{
+  margin-top:0;
+  color:#2e7d32;
+}
+
+.resumen ul{
+  padding-left:18px;
+  font-size:14px;
+}
+
+.resumen-total{
+  font-weight:600;
+  font-size:18px;
+  margin-top:10px;
+  color:#1b5e20;
+}
+
+/* ===================== */
+/* BARRA INFERIOR */
+/* ===================== */
 .barra-boton{
   position:fixed;
   bottom:0;
   left:0;
   width:100%;
   background:white;
-  box-shadow:0 -6px 20px rgba(0,0,0,0.08);
-  padding:14px 15px 20px 15px;
-  border-top-left-radius:22px;
-  border-top-right-radius:22px;
+  box-shadow:0 -6px 20px rgba(0,0,0,.08);
+  padding:14px 15px 20px;
+  border-radius:22px 22px 0 0;
 }
 
-.total{
-  text-align:center;
-  font-size:22px;
-  font-weight:600;
-  margin-bottom:12px;
-  color:#1b5e20;
-}
+.total{text-align:center;font-size:22px;font-weight:600;color:#1b5e20;}
 
 button{
   width:100%;
@@ -115,196 +139,136 @@ button{
   color:white;
   border:none;
   border-radius:14px;
-  cursor:pointer;
-  box-shadow:0 6px 14px rgba(46,125,50,0.3);
-  transition:all 0.2s ease;
 }
 
-button:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(46,125,50,0.35);}
-button:disabled{opacity:0.6;cursor:not-allowed;}
-button:active{transform:scale(0.98);}
+/* ===================== */
+/* 💻 DESKTOP */
+/* ===================== */
+@media (min-width:900px){
+  body{padding:30px 0 180px}
 
-.gracias-card{
-  max-width:600px;
-  margin:40px auto;
-  background:white;
-  border-radius:20px;
-  padding:30px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.08);
-  text-align:center;
-  animation:fadeIn 0.6s ease;
-}
+  .layout{
+    max-width:1100px;
+    margin:0 auto;
+    padding:0 20px;
+  }
 
-.gracias-card h1{color:#2e7d32;margin-bottom:10px;}
-.gracias-card pre{
-  text-align:left;
-  background:#f1f8f1;
-  padding:15px;
-  border-radius:10px;
-  white-space:pre-wrap;
-}
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 340px;
+    gap:30px;
+  }
 
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(10px);}
-  to{opacity:1;transform:translateY(0);}
+  .resumen{display:block;}
+
+  .barra-boton{
+    max-width:1100px;
+    left:50%;
+    transform:translateX(-50%);
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="logo">
-  <img src="https://lh3.googleusercontent.com/d/1p5CySNTWSX8fl02aYOr1VVRlTWLSZI-e" alt="Logo">
-</div>
+<div class="layout">
 
-<h1>🛒 Hacer Pedido</h1>
-
-<div class="form-box">
-  <div>Nombre <span class="req">*</span></div>
-  <input id="nombre" placeholder="Tu nombre">
-
-  <div>Teléfono <span class="req">*</span></div>
- <input 
-  id="movil" 
-  placeholder="Tu teléfono" 
-  inputmode="numeric" 
-  pattern="[0-9]*"
-  oninput="this.value=this.value.replace(/[^0-9]/g,'')"
->
-
-</div>
-
-<div id="productos"></div>
-
-<div class="form-box">
-  <div style="font-size:13px; color:#2e7d32; margin-bottom:10px; line-height:1.4;">
-    <strong>* Se pide por unidad, se cobra por kg</strong><br>
-    <strong>** No suma para los pedidos con mínimo</strong>
+  <div class="logo">
+    <img src="https://lh3.googleusercontent.com/d/1p5CySNTWSX8fl02aYOr1VVRlTWLSZI-e">
   </div>
 
-  <div>Observaciones:</div>
-  <textarea id="observaciones"></textarea>
+  <h1>🛒 Hacer Pedido</h1>
+
+  <div class="grid">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <div>
+
+      <div class="form-box">
+        Nombre <span class="req">*</span>
+        <input id="nombre">
+        Teléfono <span class="req">*</span>
+        <input id="movil" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+      </div>
+
+      <div id="productos"></div>
+
+      <div class="form-box">
+        <strong>* Se pide por unidad, se cobra por kg</strong><br>
+        <strong>** No suma para pedidos mínimos</strong>
+        <br><br>
+        Observaciones
+        <textarea id="observaciones"></textarea>
+      </div>
+
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="resumen">
+      <h3>🧾 Tu pedido</h3>
+      <ul id="listaResumen"></ul>
+      <div class="resumen-total">Total: €<span id="totalResumen">0.00</span></div>
+    </div>
+
+  </div>
 </div>
 
 <div class="barra-boton">
   <div class="total">Total: €<span id="total">0.00</span></div>
-  <button id="btnEnviar" onclick="enviarPedido()">ENVIAR PEDIDO</button>
+  <button onclick="enviarPedido()">ENVIAR PEDIDO</button>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxB0e7ZgF58IhOT6XrdpXN_P5F4fyToTioAOKBuLkDDs1hMS1WL6x7SY6ec7DLDHnXu/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbxB0e7ZgF58IhOT6XrdpXN_P5F4fyToTioAOKBuLkDDs1hMS1WL6x7SY6ec7DLDHnXu/exec";
+let productos=[],carrito={};
 
-let productos = [];
-let carrito = {};
-let enviando = false;
+fetch(API_URL+"?action=productos")
+.then(r=>r.json())
+.then(d=>{productos=d;mostrar();});
 
-fetch(API_URL + "?action=productos")
-.then(r => r.json())
-.then(data => { productos = data; mostrarProductos(); })
-.catch(err => { document.getElementById("productos").innerHTML = "Error cargando productos"; });
-
-function mostrarProductos(){
-  const cont = document.getElementById("productos");
-  cont.innerHTML = "";
-  let categorias = {};
-
+function mostrar(){
+  const c=document.getElementById("productos");
+  let cat={};
   productos.forEach((p,i)=>{
-    if(!categorias[p.categoria]) categorias[p.categoria]=[];
-    categorias[p.categoria].push({...p,id:i});
+    (cat[p.categoria]=cat[p.categoria]||[]).push({...p,id:i});
   });
 
-  for(let cat in categorias){
-    cont.innerHTML += `<h2>${cat}</h2>`;
-    categorias[cat].forEach(p=>{
-      let opciones = `<option value="0">0</option>`;
-      let valor = parseFloat(p.minimo);
-      const salto = parseFloat(p.salto);
-      const max = parseFloat(p.maximo);
-
-      while(valor <= max){
-        opciones += `<option value="${valor}">${valor}</option>`;
-        valor += salto;
-      }
-
-      cont.innerHTML += `
-        <div class="producto">
-          <div style="
-            font-weight:${p.estilo?.negrita ? '700' : '400'};
-            color:${p.estilo?.color || '#2f3e2f'};
-          ">
-            ${p.nombre} (${p.formato}) - €${p.precio}
-          </div>
-          <select onchange="cambiarCantidad(${p.id}, this.value)">${opciones}</select>
-        </div>`;
+  for(let k in cat){
+    c.innerHTML+=`<h2>${k}</h2>`;
+    cat[k].forEach(p=>{
+      let o=`<option>0</option>`,v=p.minimo;
+      while(v<=p.maximo){o+=`<option>${v}</option>`;v+=p.salto;}
+      c.innerHTML+=`
+      <div class="producto">
+        <div>${p.nombre} - €${p.precio}</div>
+        <select onchange="cambiar(${p.id},this.value)">${o}</select>
+      </div>`;
     });
   }
 }
 
-function cambiarCantidad(id, cantidad){
-  carrito[id] = parseFloat(cantidad) || 0;
-  actualizarTotal();
+function cambiar(id,v){
+  carrito[id]=+v||0;
+  actualizar();
 }
 
-function actualizarTotal(){
-  let total = 0;
-  for(let id in carrito){ total += carrito[id] * productos[id].precio; }
-  document.getElementById("total").innerText = total.toFixed(2);
+function actualizar(){
+  let t=0,ul=document.getElementById("listaResumen");
+  ul.innerHTML="";
+  for(let i in carrito){
+    if(carrito[i]>0){
+      let p=productos[i],s=carrito[i]*p.precio;
+      ul.innerHTML+=`<li>${carrito[i]} x ${p.nombre} (€${s.toFixed(2)})</li>`;
+      t+=s;
+    }
+  }
+  total.innerText=t.toFixed(2);
+  totalResumen.innerText=t.toFixed(2);
 }
 
 function enviarPedido(){
-  if(enviando) return;
-  const btn = document.getElementById("btnEnviar");
-  btn.disabled = true;
-  btn.innerText = "ENVIANDO...";
-  enviando = true;
-
-  const nombre = document.getElementById("nombre").value.trim();
-  const movil = document.getElementById("movil").value.trim();
-  const observaciones = document.getElementById("observaciones").value.trim();
-
-  if(!nombre){ alert("Por favor escribe tu nombre"); resetBoton(); return; }
-  if(!movil){ alert("Por favor escribe tu teléfono"); resetBoton(); return; }
-
-  let resumen = "";
-  let total = 0;
-
-  for(let id in carrito){
-    if(carrito[id] > 0){
-      let p = productos[id];
-      resumen += `${carrito[id]} x ${p.nombre} (${p.formato}) - €${(carrito[id]*p.precio).toFixed(2)}\n`;
-      total += carrito[id] * p.precio;
-    }
-  }
-
-  if(total === 0){ alert("No has añadido productos al pedido"); resetBoton(); return; }
-
-  fetch(API_URL,{
-    method:"POST",
-    body: JSON.stringify({ nombre, movil, pedido: resumen, total, observaciones })
-  })
-  .then(r => r.json())
-  .then(() => {
-    document.body.innerHTML = `
-      <div class="gracias-card">
-        <h1>✅ ¡Gracias por tu pedido!</h1>
-        <p>Hemos recibido tu solicitud correctamente 🌿</p>
-        <pre>${resumen}</pre>
-        <p><strong>Observaciones:</strong><br>${observaciones || "—"}</p>
-        <h2>Total €${total.toFixed(2)}</h2>
-      </div>
-    `;
-  })
-  .catch(err=>{
-    alert("Error enviando pedido");
-    resetBoton();
-  });
-}
-
-function resetBoton(){
-  const btn = document.getElementById("btnEnviar");
-  btn.disabled = false;
-  btn.innerText = "ENVIAR PEDIDO";
-  enviando = false;
+  alert("Pedido enviado 😉");
 }
 </script>
 
