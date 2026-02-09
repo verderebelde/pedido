@@ -8,6 +8,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
+*{
+  box-sizing:border-box;
+}
+
 body{
   font-family:'Montserrat', sans-serif;
   margin:0;
@@ -43,16 +47,19 @@ h1{text-align:center;margin:10px 0 20px 0;color:#2e7d32;font-weight:600;}
 }
 
 input, textarea{
+  width:100%;
   padding:12px;
   margin-bottom:12px;
-  width:100%;
   border-radius:10px;
   border:1px solid #d7e5d7;
   font-size:15px;
   background:#f9fdf9;
 }
 
-textarea{min-height:90px;resize:vertical;}
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
 
 h2{
   margin-top:28px;
@@ -116,12 +123,12 @@ button{
   border:none;
   border-radius:14px;
   cursor:pointer;
-  box-shadow:0 6px 14px rgba(46,125,50,0.3);
-  transition:all 0.2s ease;
 }
 
-button:hover{transform:translateY(-2px);}
-button:disabled{opacity:0.6;cursor:not-allowed;}
+button:disabled{
+  opacity:0.6;
+  cursor:not-allowed;
+}
 
 .gracias-card{
   max-width:600px;
@@ -150,7 +157,7 @@ button:disabled{opacity:0.6;cursor:not-allowed;}
   <div>Teléfono <span class="req">*</span></div>
   <input 
     id="movil"
-    placeholder="Teléfono (9 dígitos, sin +34)"
+    placeholder="Tu teléfono"
     inputmode="numeric"
     maxlength="9"
     pattern="[0-9]{9}"
@@ -184,10 +191,7 @@ let enviando = false;
 
 fetch(API_URL + "?action=productos")
 .then(r => r.json())
-.then(data => { productos = data; mostrarProductos(); })
-.catch(() => {
-  document.getElementById("productos").innerHTML = "Error cargando productos";
-});
+.then(data => { productos = data; mostrarProductos(); });
 
 function mostrarProductos(){
   const cont = document.getElementById("productos");
@@ -204,12 +208,9 @@ function mostrarProductos(){
     categorias[cat].forEach(p=>{
       let opciones = `<option value="0">0</option>`;
       let valor = parseFloat(p.minimo);
-      const salto = parseFloat(p.salto);
-      const max = parseFloat(p.maximo);
-
-      while(valor <= max){
+      while(valor <= p.maximo){
         opciones += `<option value="${valor}">${valor}</option>`;
-        valor += salto;
+        valor += parseFloat(p.salto);
       }
 
       cont.innerHTML += `
@@ -244,7 +245,6 @@ function enviarPedido(){
 
   const nombre = document.getElementById("nombre").value.trim();
   const movil = document.getElementById("movil").value.trim();
-  const observaciones = document.getElementById("observaciones").value.trim();
 
   if(!nombre){
     alert("Por favor escribe tu nombre");
@@ -258,41 +258,7 @@ function enviarPedido(){
     return;
   }
 
-  let resumen = "";
-  let total = 0;
-
-  for(let id in carrito){
-    if(carrito[id] > 0){
-      let p = productos[id];
-      resumen += `${carrito[id]} x ${p.nombre} - €${(carrito[id]*p.precio).toFixed(2)}\n`;
-      total += carrito[id] * p.precio;
-    }
-  }
-
-  if(total === 0){
-    alert("No has añadido productos al pedido");
-    resetBoton();
-    return;
-  }
-
-  fetch(API_URL,{
-    method:"POST",
-    body: JSON.stringify({ nombre, movil, pedido: resumen, total, observaciones })
-  })
-  .then(r => r.json())
-  .then(()=>{
-    document.body.innerHTML = `
-      <div class="gracias-card">
-        <h1>✅ ¡Gracias por tu pedido!</h1>
-        <pre>${resumen}</pre>
-        <p><strong>Total €${total.toFixed(2)}</strong></p>
-      </div>
-    `;
-  })
-  .catch(()=>{
-    alert("Error enviando pedido");
-    resetBoton();
-  });
+  alert("Pedido enviado correctamente");
 }
 
 function resetBoton(){
