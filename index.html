@@ -8,9 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{ box-sizing:border-box; }
 
 body{
   font-family:'Montserrat', sans-serif;
@@ -47,19 +45,16 @@ h1{text-align:center;margin:10px 0 20px 0;color:#2e7d32;font-weight:600;}
 }
 
 input, textarea{
-  width:100%;
   padding:12px;
   margin-bottom:12px;
+  width:100%;
   border-radius:10px;
   border:1px solid #d7e5d7;
   font-size:15px;
   background:#f9fdf9;
 }
 
-textarea{
-  min-height:90px;
-  resize:vertical;
-}
+textarea{min-height:90px;resize:vertical;}
 
 h2{
   margin-top:28px;
@@ -125,10 +120,7 @@ button{
   cursor:pointer;
 }
 
-button:disabled{
-  opacity:0.6;
-  cursor:not-allowed;
-}
+button:disabled{opacity:0.6;cursor:not-allowed;}
 
 .gracias-card{
   max-width:600px;
@@ -155,12 +147,11 @@ button:disabled{
   <input id="nombre" placeholder="Tu nombre">
 
   <div>Teléfono <span class="req">*</span></div>
-  <input 
+  <input
     id="movil"
     placeholder="Tu teléfono"
     inputmode="numeric"
     maxlength="9"
-    pattern="[0-9]{9}"
     oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)"
   >
 </div>
@@ -168,9 +159,9 @@ button:disabled{
 <div id="productos"></div>
 
 <div class="form-box">
-  <div style="font-size:13px;color:#2e7d32;margin-bottom:10px;">
+  <div style="font-size:13px;color:#2e7d32;margin-bottom:10px;line-height:1.4;">
     <strong>* Se pide por unidad, se cobra por kg</strong><br>
-    <strong>** No suma para pedidos con mínimo</strong>
+    <strong>** No suma para los pedidos con mínimo</strong>
   </div>
 
   <div>Observaciones:</div>
@@ -245,20 +236,53 @@ function enviarPedido(){
 
   const nombre = document.getElementById("nombre").value.trim();
   const movil = document.getElementById("movil").value.trim();
+  const observaciones = document.getElementById("observaciones").value.trim();
 
   if(!nombre){
     alert("Por favor escribe tu nombre");
-    resetBoton();
-    return;
+    resetBoton(); return;
   }
 
   if(movil.length !== 9){
     alert("El teléfono tiene que tener 9 caracteres, no agregar +34");
-    resetBoton();
-    return;
+    resetBoton(); return;
   }
 
-  alert("Pedido enviado correctamente");
+  let resumen = "";
+  let total = 0;
+
+  for(let id in carrito){
+    if(carrito[id] > 0){
+      let p = productos[id];
+      resumen += `${carrito[id]} x ${p.nombre} (${p.formato}) - €${(carrito[id]*p.precio).toFixed(2)}\n`;
+      total += carrito[id] * p.precio;
+    }
+  }
+
+  if(total === 0){
+    alert("No has añadido productos al pedido");
+    resetBoton(); return;
+  }
+
+  fetch(API_URL,{
+    method:"POST",
+    body: JSON.stringify({ nombre, movil, pedido: resumen, total, observaciones })
+  })
+  .then(r => r.json())
+  .then(()=>{
+    document.body.innerHTML = `
+      <div class="gracias-card">
+        <h1>✅ ¡Gracias por tu pedido!</h1>
+        <pre>${resumen}</pre>
+        <p><strong>Observaciones:</strong><br>${observaciones || "—"}</p>
+        <h2>Total €${total.toFixed(2)}</h2>
+      </div>
+    `;
+  })
+  .catch(()=>{
+    alert("Error enviando pedido");
+    resetBoton();
+  });
 }
 
 function resetBoton(){
