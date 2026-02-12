@@ -25,7 +25,7 @@ body{
   padding:20px;
   color: var(--text);
   background-color: var(--bg);
-  padding-bottom: 120px; /* Espacio para la barra fija doble en móvil */
+  padding-bottom: 120px; 
 }
 
 .contenedor{
@@ -181,7 +181,7 @@ select{
 
 .btn-verde:hover { background: var(--primary-dark); }
 
-/* RESUMEN MÓVIL (No fijo, debajo de observaciones) */
+/* RESUMEN MÓVIL */
 #resumen-movil-contenedor {
   display: none;
 }
@@ -214,7 +214,7 @@ select{
   body { padding-bottom: 140px; }
   .layout { flex-direction:column; }
   .col-izq, .col-der { max-width: 100%; width: 100%; }
-  .col-der { display: none; } /* Ocultar lateral en móvil */
+  .col-der { display: none; } 
   
   #resumen-movil-contenedor { 
     display: block; 
@@ -264,7 +264,7 @@ select{
 
     <div class="form-box">
       <label class="label-form">Observaciones:</label>
-      <textarea id="observaciones" placeholder="Ej: Dejar en portería..."></textarea>
+      <textarea id="observaciones"></textarea>
     </div>
 
     <div id="resumen-movil-contenedor">
@@ -421,7 +421,7 @@ function enviarPedido(){
     document.body.innerHTML = `
       <div class="gracias-card">
         <h1 style="color:var(--primary)">✅ ¡Pedido Enviado!</h1>
-        <p>Gracias <strong>${nombre}</strong>, procesaremos tu pedido lo antes posible.</p>
+        <p>Gracias <strong>${nombre}</strong>.</p>
         <div style="text-align:left; background:#f4fbf6; padding:20px; border-radius:15px; margin-top:20px; font-size:14px; border:1px solid #e0eee0;">
           <pre style="white-space:pre-wrap; font-family:inherit;">${resumenTexto}</pre>
           <hr style="border:0; border-top:1px solid #ddd; margin:10px 0;">
