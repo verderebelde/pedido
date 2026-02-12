@@ -117,20 +117,22 @@ select{
   flex-direction:column;
 }
 
+/* BOTÓN ELIMINAR MINIMALISTA */
 .btn-eliminar{
-  background:#ffebee;
-  color:#c62828;
-  border:none;
-  border-radius:8px;
-  padding:6px 10px;
-  font-size:12px;
-  font-weight:600;
-  cursor:pointer;
-  transition:0.2s;
+  background: transparent;
+  color: #ccc; /* Gris muy claro, se ve poco */
+  border: none;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 10px; /* Tamaño muy pequeño */
+  cursor: pointer;
+  transition: 0.2s;
+  line-height: 1;
 }
 
 .btn-eliminar:hover{
-  background:#ffcdd2;
+  color: #999; /* Se nota un poco más al pasar el ratón */
+  background: #f0f0f0;
 }
 
 .total{
@@ -140,7 +142,7 @@ select{
   color:#1b5e20;
 }
 
-button{
+button#btnEnviar{
   width:100%;
   padding:15px;
   font-size:17px;
@@ -153,7 +155,7 @@ button{
   margin-top:15px;
 }
 
-button:disabled{opacity:0.6;}
+button#btnEnviar:disabled{opacity:0.6;}
 
 .req{color:#c62828;font-size:12px;margin-left:4px;}
 
@@ -294,7 +296,7 @@ function actualizarResumen(){
             <strong>${carrito[id]} x ${p.nombre}</strong>
             <span>€${subtotal.toFixed(2)}</span>
           </div>
-          <button class="btn-eliminar" onclick="eliminarProducto(${id})">✕</button>
+          <button class="btn-eliminar" onclick="eliminarProducto(${id})" title="Quitar">✕</button>
         </div>`;
     }
   }
