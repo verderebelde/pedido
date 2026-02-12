@@ -100,11 +100,37 @@ select{
   background:#f1f8f1;
 }
 
+/* RESUMEN */
 .resumen-item{
   display:flex;
   justify-content:space-between;
+  align-items:center;
   font-size:14px;
-  margin-bottom:8px;
+  margin-bottom:10px;
+  background:#f8fbf8;
+  padding:8px 10px;
+  border-radius:10px;
+}
+
+.resumen-info{
+  display:flex;
+  flex-direction:column;
+}
+
+.btn-eliminar{
+  background:#ffebee;
+  color:#c62828;
+  border:none;
+  border-radius:8px;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.btn-eliminar:hover{
+  background:#ffcdd2;
 }
 
 .total{
@@ -188,7 +214,6 @@ button:disabled{opacity:0.6;}
 
 </div>
 
-<!-- COLUMNA DERECHA -->
 <div class="col-der">
   <h2>🧾 Tu Pedido</h2>
   <div id="resumen"></div>
@@ -233,7 +258,7 @@ function mostrarProductos(){
       cont.innerHTML += `
         <div class="producto">
           <div>${p.nombre} (${p.formato}) - €${p.precio}</div>
-          <select onchange="cambiarCantidad(${p.id}, this.value)">
+          <select id="select-${p.id}" onchange="cambiarCantidad(${p.id}, this.value)">
             ${opciones}
           </select>
         </div>`;
@@ -243,6 +268,13 @@ function mostrarProductos(){
 
 function cambiarCantidad(id, cantidad){
   carrito[id] = parseFloat(cantidad) || 0;
+  actualizarResumen();
+}
+
+function eliminarProducto(id){
+  carrito[id] = 0;
+  const select = document.getElementById("select-" + id);
+  if(select) select.value = 0;
   actualizarResumen();
 }
 
@@ -258,8 +290,11 @@ function actualizarResumen(){
 
       resumenHTML += `
         <div class="resumen-item">
-          <span>${carrito[id]} x ${p.nombre}</span>
-          <span>€${subtotal.toFixed(2)}</span>
+          <div class="resumen-info">
+            <strong>${carrito[id]} x ${p.nombre}</strong>
+            <span>€${subtotal.toFixed(2)}</span>
+          </div>
+          <button class="btn-eliminar" onclick="eliminarProducto(${id})">✕</button>
         </div>`;
     }
   }
