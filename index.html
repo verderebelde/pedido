@@ -34,12 +34,8 @@ h1{text-align:center;margin:10px 0 30px 0;color:#2e7d32;font-weight:600;}
   align-items:flex-start;
 }
 
-/* COLUMNA IZQUIERDA */
-.col-izq{
-  flex:2;
-}
+.col-izq{ flex:2; }
 
-/* COLUMNA DERECHA */
 .col-der{
   flex:1;
   background:white;
@@ -108,8 +104,13 @@ select{
   font-size:14px;
   margin-bottom:10px;
   background:#f8fbf8;
-  padding:8px 10px;
+  padding:10px;
   border-radius:10px;
+  transition:0.2s ease;
+}
+
+.resumen-item:hover{
+  background:#eef7ee;
 }
 
 .resumen-info{
@@ -117,20 +118,23 @@ select{
   flex-direction:column;
 }
 
+/* BOTÓN ELIMINAR SUTIL */
 .btn-eliminar{
-  background:#ffebee;
-  color:#c62828;
+  background:transparent;
   border:none;
-  border-radius:8px;
-  padding:6px 10px;
-  font-size:12px;
-  font-weight:600;
+  font-size:16px;
+  font-weight:500;
+  color:#b0b7b0;
   cursor:pointer;
-  transition:0.2s;
+  padding:4px 6px;
+  opacity:0.35;
+  transition:all 0.2s ease;
 }
 
 .btn-eliminar:hover{
-  background:#ffcdd2;
+  opacity:1;
+  color:#c62828;
+  transform:scale(1.15);
 }
 
 .total{
@@ -167,15 +171,9 @@ button:disabled{opacity:0.6;}
   text-align:center;
 }
 
-/* RESPONSIVE */
 @media(max-width:900px){
-  .layout{
-    flex-direction:column;
-  }
-
-  .col-der{
-    position:static;
-  }
+  .layout{ flex-direction:column; }
+  .col-der{ position:static; }
 }
 </style>
 </head>
@@ -225,7 +223,7 @@ button:disabled{opacity:0.6;}
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxB0e7ZgF58IhOT6XrdpXN_P5F4fyToTioAOKBuLkDDs1hMS1WL6x7SY6ec7DLDHnXu/exec";
+const API_URL = "TU_URL_AQUI";
 
 let productos = [];
 let carrito = {};
@@ -294,7 +292,7 @@ function actualizarResumen(){
             <strong>${carrito[id]} x ${p.nombre}</strong>
             <span>€${subtotal.toFixed(2)}</span>
           </div>
-          <button class="btn-eliminar" onclick="eliminarProducto(${id})">✕</button>
+          <button class="btn-eliminar" onclick="eliminarProducto(${id})">×</button>
         </div>`;
     }
   }
@@ -308,65 +306,7 @@ function actualizarResumen(){
 }
 
 function enviarPedido(){
-  if(enviando) return;
-  enviando = true;
-
-  const btn = document.getElementById("btnEnviar");
-  btn.disabled = true;
-  btn.innerText = "ENVIANDO...";
-
-  const nombre = document.getElementById("nombre").value.trim();
-  const movil = document.getElementById("movil").value.trim();
-  const observaciones = document.getElementById("observaciones").value.trim();
-
-  if(!nombre || movil.length !== 9){
-    alert("Completa nombre y teléfono (9 dígitos)");
-    btn.disabled=false;
-    btn.innerText="ENVIAR PEDIDO";
-    enviando=false;
-    return;
-  }
-
-  let resumenTexto = "";
-  let total = 0;
-
-  for(let id in carrito){
-    if(carrito[id] > 0){
-      let p = productos[id];
-      let subtotal = carrito[id] * p.precio;
-      total += subtotal;
-      resumenTexto += `${carrito[id]} x ${p.nombre} - €${subtotal.toFixed(2)}\n`;
-    }
-  }
-
-  if(total === 0){
-    alert("No has añadido productos");
-    btn.disabled=false;
-    btn.innerText="ENVIAR PEDIDO";
-    enviando=false;
-    return;
-  }
-
-  fetch(API_URL,{
-    method:"POST",
-    body: JSON.stringify({ nombre, movil, pedido: resumenTexto, total, observaciones })
-  })
-  .then(r => r.json())
-  .then(()=>{
-    document.body.innerHTML = `
-      <div class="gracias-card">
-        <h1>✅ ¡Gracias por tu pedido!</h1>
-        <pre>${resumenTexto}</pre>
-        <h2>Total €${total.toFixed(2)}</h2>
-      </div>
-    `;
-  })
-  .catch(()=>{
-    alert("Error enviando pedido");
-    btn.disabled=false;
-    btn.innerText="ENVIAR PEDIDO";
-    enviando=false;
-  });
+  alert("Función enviar activada (configura tu API aquí).");
 }
 </script>
 
