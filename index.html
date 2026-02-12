@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pedido Online</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 *{ box-sizing:border-box; }
@@ -13,100 +13,108 @@
 body{
   font-family:'Montserrat', sans-serif;
   margin:0;
-  padding:30px;
-  background:linear-gradient(180deg,#f4fbf6,#ffffff);
+  padding:20px;
   color:#2f3e2f;
+  background:linear-gradient(180deg,#f4fbf6,#ffffff);
 }
 
 .contenedor{
-  max-width:1300px;
+  max-width:1200px;
   margin:0 auto;
 }
 
-.logo{text-align:center;margin-bottom:20px;}
-.logo img{max-width:180px;}
+.logo{text-align:center;margin:10px 0;}
+.logo img{max-width:170px;height:auto;}
 
-h1{
-  text-align:center;
-  margin-bottom:40px;
-  color:#1b5e20;
-  font-weight:700;
-}
+h1{text-align:center;margin:10px 0 30px 0;color:#2e7d32;font-weight:600;}
 
 .layout{
   display:flex;
-  gap:40px;
+  gap:30px;
   align-items:flex-start;
 }
 
-/* IZQUIERDA */
 .col-izq{flex:2;}
 
-.producto{
+.col-der{
+  flex:1;
   background:white;
-  padding:18px;
+  padding:20px;
   border-radius:18px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.06);
-  margin-bottom:15px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+  position:sticky;
+  top:20px;
+}
+
+.form-box{
+  background:white;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.06);
+  margin-bottom:20px;
+}
+
+input, textarea{
+  padding:12px;
+  margin-bottom:12px;
+  width:100%;
+  border-radius:10px;
+  border:1px solid #d7e5d7;
+  font-size:15px;
+  background:#f9fdf9;
+}
+
+textarea{min-height:90px;resize:vertical;}
+
+h2{
+  margin-top:30px;
+  border-left:6px solid #66bb6a;
+  padding-left:10px;
+  color:#2e7d32;
+  font-weight:600;
+}
+
+.producto{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  transition:all 0.2s ease;
-}
-
-.producto:hover{
-  transform:translateY(-3px);
-  box-shadow:0 12px 30px rgba(0,0,0,0.1);
-}
-
-.producto-info{
-  font-size:15px;
+  background:white;
+  padding:14px;
+  margin:10px 0;
+  border-radius:14px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.05);
+  font-size:14px;
 }
 
 select{
   padding:8px;
   border-radius:8px;
-  border:1px solid #d7e5d7;
-  background:#f9fdf9;
+  border:1px solid #c8d6c8;
+  width:90px;
+  text-align:center;
   font-weight:600;
+  background:#f1f8f1;
 }
 
-h2{
-  margin-top:40px;
-  margin-bottom:15px;
-  color:#2e7d32;
-  font-weight:600;
-}
-
-/* DERECHA */
-.col-der{
-  flex:1;
-  background:white;
-  padding:25px;
-  border-radius:22px;
-  box-shadow:0 12px 35px rgba(0,0,0,0.08);
-  position:sticky;
-  top:30px;
-}
-
+/* RESUMEN */
 .resumen-item{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:12px;
-  padding-bottom:10px;
-  border-bottom:1px solid #f0f0f0;
   font-size:14px;
+  margin-bottom:8px;
+  padding-bottom:6px;
+  border-bottom:1px solid #f0f0f0;
 }
 
 .eliminar{
   background:#ffebee;
   color:#c62828;
   border:none;
-  border-radius:8px;
-  padding:4px 8px;
-  cursor:pointer;
+  border-radius:6px;
+  padding:3px 7px;
   font-size:12px;
+  cursor:pointer;
 }
 
 .eliminar:hover{
@@ -114,51 +122,40 @@ h2{
 }
 
 .total{
-  font-size:22px;
-  font-weight:700;
-  margin-top:20px;
+  font-size:20px;
+  font-weight:600;
+  margin-top:15px;
   color:#1b5e20;
 }
 
-button.enviar{
+button{
   width:100%;
-  margin-top:20px;
-  padding:16px;
-  border:none;
-  border-radius:14px;
+  padding:15px;
   font-size:17px;
   font-weight:600;
-  background:linear-gradient(135deg,#43a047,#1b5e20);
+  background:linear-gradient(135deg,#43a047,#2e7d32);
   color:white;
+  border:none;
+  border-radius:14px;
   cursor:pointer;
-  transition:all 0.2s ease;
+  margin-top:15px;
 }
 
-button.enviar:hover{
-  transform:scale(1.02);
-}
+button:disabled{opacity:0.6;}
 
-/* FORM */
-.form-box{
+.req{color:#c62828;font-size:12px;margin-left:4px;}
+
+.gracias-card{
+  max-width:600px;
+  margin:60px auto;
   background:white;
-  padding:20px;
-  border-radius:18px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.05);
-  margin-bottom:30px;
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+  text-align:center;
 }
 
-input, textarea{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #d7e5d7;
-  margin-bottom:12px;
-  background:#f9fdf9;
-}
-
-textarea{min-height:80px;resize:vertical;}
-
-/* MOBILE */
+/* RESPONSIVE */
 @media(max-width:900px){
   .layout{flex-direction:column;}
   .col-der{position:static;}
@@ -181,33 +178,37 @@ textarea{min-height:80px;resize:vertical;}
 <div class="col-izq">
 
 <div class="form-box">
-  <input id="nombre" placeholder="Nombre *">
-  <input id="movil" placeholder="Teléfono *"
-    inputmode="numeric"
-    maxlength="9"
+  <div>Nombre *</div>
+  <input id="nombre">
+
+  <div>Teléfono *</div>
+  <input id="movil" maxlength="9"
     oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)">
 </div>
 
 <div id="productos"></div>
 
 <div class="form-box">
-  <textarea id="observaciones" placeholder="Observaciones"></textarea>
+  <div>Observaciones:</div>
+  <textarea id="observaciones"></textarea>
 </div>
 
 </div>
 
 <div class="col-der">
   <h2>🧾 Tu Pedido</h2>
-  <div id="resumen"></div>
+  <div id="resumen">
+    <p style="color:#777;font-size:14px;">No has añadido productos</p>
+  </div>
   <div class="total">Total: €<span id="total">0.00</span></div>
-  <button class="enviar" id="btnEnviar" onclick="enviarPedido()">ENVIAR PEDIDO</button>
+  <button id="btnEnviar" onclick="enviarPedido()">ENVIAR PEDIDO</button>
 </div>
 
 </div>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxB0e7ZgF58IhOT6XrdpXN_P5F4fyToTioAOKBuLkDDs1hMS1WL6x7SY6ec7DLDHnXu/exec";
+const API_URL = "TU_URL_AQUI";
 
 let productos = [];
 let carrito = {};
@@ -239,7 +240,7 @@ function mostrarProductos(){
 
       cont.innerHTML += `
         <div class="producto">
-          <div class="producto-info">
+          <div>
             <strong>${p.nombre}</strong><br>
             €${p.precio} (${p.formato})
           </div>
@@ -274,9 +275,7 @@ function actualizarResumen(){
 
       resumenHTML += `
         <div class="resumen-item">
-          <div>
-            ${carrito[id]} x ${p.nombre}
-          </div>
+          <div>${carrito[id]} x ${p.nombre}</div>
           <div>
             €${subtotal.toFixed(2)}
             <button class="eliminar" onclick="eliminarProducto(${id})">✕</button>
@@ -286,72 +285,11 @@ function actualizarResumen(){
   }
 
   if(resumenHTML===""){
-    resumenHTML="<p style='color:#888;font-size:14px;'>No hay productos añadidos</p>";
+    resumenHTML="<p style='color:#777;font-size:14px;'>No has añadido productos</p>";
   }
 
   document.getElementById("resumen").innerHTML = resumenHTML;
   document.getElementById("total").innerText = total.toFixed(2);
-}
-
-function enviarPedido(){
-  if(enviando) return;
-  enviando=true;
-
-  const btn=document.getElementById("btnEnviar");
-  btn.disabled=true;
-  btn.innerText="ENVIANDO...";
-
-  const nombre=document.getElementById("nombre").value.trim();
-  const movil=document.getElementById("movil").value.trim();
-  const observaciones=document.getElementById("observaciones").value.trim();
-
-  if(!nombre || movil.length!==9){
-    alert("Completa nombre y teléfono (9 dígitos)");
-    btn.disabled=false;
-    btn.innerText="ENVIAR PEDIDO";
-    enviando=false;
-    return;
-  }
-
-  let resumenTexto="";
-  let total=0;
-
-  for(let id in carrito){
-    if(carrito[id]>0){
-      let p=productos[id];
-      let subtotal=carrito[id]*p.precio;
-      total+=subtotal;
-      resumenTexto+=`${carrito[id]} x ${p.nombre} - €${subtotal.toFixed(2)}\n`;
-    }
-  }
-
-  if(total===0){
-    alert("No has añadido productos");
-    btn.disabled=false;
-    btn.innerText="ENVIAR PEDIDO";
-    enviando=false;
-    return;
-  }
-
-  fetch(API_URL,{
-    method:"POST",
-    body:JSON.stringify({nombre,movil,pedido:resumenTexto,total,observaciones})
-  })
-  .then(r=>r.json())
-  .then(()=>{
-    document.body.innerHTML=`
-      <div style="max-width:600px;margin:80px auto;text-align:center;background:white;padding:40px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,0.1);">
-        <h1>✅ Pedido Enviado</h1>
-        <pre>${resumenTexto}</pre>
-        <h2>Total €${total.toFixed(2)}</h2>
-      </div>`;
-  })
-  .catch(()=>{
-    alert("Error enviando pedido");
-    btn.disabled=false;
-    btn.innerText="ENVIAR PEDIDO";
-    enviando=false;
-  });
 }
 </script>
 
