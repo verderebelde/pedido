@@ -3,79 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pedido Online</title>
+<title>Pedido Online | Mercado Fresco</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
+:root {
+  --primary: #2e7d32;
+  --primary-light: #e8f5e9;
+  --accent: #66bb6a;
+  --text: #2f3e2f;
+  --bg: #f8faf8;
+}
+
 *{ box-sizing:border-box; }
 
 body{
   font-family:'Montserrat', sans-serif;
   margin:0;
   padding:20px;
-  color:#2f3e2f;
-  background:linear-gradient(180deg,#f4fbf6,#ffffff);
+  color: var(--text);
+  background-color: var(--bg);
+  background-image: radial-gradient(#dcedc8 0.5px, transparent 0.5px);
+  background-size: 20px 20px; /* Sutil patrón de puntos */
 }
 
 .contenedor{
-  max-width:1200px;
+  max-width: 1000px; /* Más angosto para mejor lectura */
   margin:0 auto;
 }
 
-.logo{text-align:center;margin:10px 0;}
-.logo img{max-width:170px;height:auto;}
+.logo{text-align:center; margin: 20px 0;}
+.logo img{max-width:140px; height:auto; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.05);}
 
-h1{text-align:center;margin:10px 0 30px 0;color:#2e7d32;font-weight:600;}
+h1{
+  text-align:center;
+  margin:10px 0 40px 0;
+  color: var(--primary);
+  font-weight:600;
+  letter-spacing: -1px;
+}
 
 .layout{
   display:flex;
-  gap:30px;
+  gap:40px;
   align-items:flex-start;
 }
 
-/* COLUMNA IZQUIERDA */
+/* COLUMNA IZQUIERDA (Formulario y Productos) */
 .col-izq{
-  flex:2;
+  flex: 1.6;
+  max-width: 600px; /* Limitamos el ancho del listado */
 }
 
-/* COLUMNA DERECHA */
+/* COLUMNA DERECHA (Resumen) */
 .col-der{
-  flex:1;
-  background:white;
-  padding:20px;
-  border-radius:18px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.08);
-  position:sticky;
-  top:20px;
+  flex: 1;
+  background: white;
+  padding: 25px;
+  border-radius: 24px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 20px;
+  border: 1px solid #edf2ed;
 }
 
 .form-box{
-  background:white;
-  padding:20px;
-  border-radius:16px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.06);
-  margin-bottom:20px;
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  margin-bottom: 25px;
+  border: 1px solid #edf2ed;
+}
+
+.label-form {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--primary);
+  display: block;
 }
 
 input, textarea{
-  padding:12px;
-  margin-bottom:12px;
-  width:100%;
-  border-radius:10px;
-  border:1px solid #d7e5d7;
-  font-size:15px;
-  background:#f9fdf9;
+  padding: 14px;
+  margin-bottom: 15px;
+  width: 100%;
+  border-radius: 12px;
+  border: 1.5px solid #e0eee0;
+  font-size: 15px;
+  background: #fdfdfd;
+  transition: all 0.3s;
 }
 
-textarea{min-height:90px;resize:vertical;}
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: white;
+  box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+textarea{min-height:80px; resize:vertical;}
 
 h2{
-  margin-top:30px;
-  border-left:6px solid #66bb6a;
-  padding-left:10px;
-  color:#2e7d32;
-  font-weight:600;
+  margin: 40px 0 15px 0;
+  font-size: 1.2rem;
+  color: var(--primary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+h2::after {
+  content: "";
+  height: 2px;
+  background: var(--primary-light);
+  flex: 1;
+  margin-left: 15px;
 }
 
 .producto{
@@ -83,21 +127,34 @@ h2{
   justify-content:space-between;
   align-items:center;
   background:white;
-  padding:14px;
-  margin:10px 0;
-  border-radius:14px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.05);
-  font-size:14px;
+  padding:16px 20px;
+  margin:12px 0;
+  border-radius:16px;
+  border: 1px solid #f0f4f0;
+  transition: transform 0.2s;
 }
 
+.producto:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+}
+
+.prod-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.prod-name { font-weight: 500; font-size: 15px; }
+.prod-meta { font-size: 12px; color: #88a088; margin-top: 2px; }
+
 select{
-  padding:8px;
-  border-radius:8px;
-  border:1px solid #c8d6c8;
-  width:90px;
-  text-align:center;
-  font-weight:600;
-  background:#f1f8f1;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #c8d6c8;
+  width: 85px;
+  font-weight: 600;
+  background: #f1f8f1;
+  cursor: pointer;
 }
 
 /* RESUMEN */
@@ -106,78 +163,90 @@ select{
   justify-content:space-between;
   align-items:center;
   font-size:14px;
-  margin-bottom:10px;
-  background:#f8fbf8;
-  padding:8px 10px;
-  border-radius:10px;
+  margin-bottom:12px;
+  background: var(--primary-light);
+  padding: 10px 14px;
+  border-radius:12px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .resumen-info{
   display:flex;
   flex-direction:column;
+  gap: 2px;
 }
 
-/* BOTÓN ELIMINAR MINIMALISTA */
 .btn-eliminar{
   background: transparent;
-  color: #ccc; /* Gris muy claro, se ve poco */
+  color: #bbb;
   border: none;
-  border-radius: 4px;
-  padding: 2px 5px;
-  font-size: 10px; /* Tamaño muy pequeño */
+  padding: 5px;
+  font-size: 10px;
   cursor: pointer;
   transition: 0.2s;
-  line-height: 1;
 }
 
-.btn-eliminar:hover{
-  color: #999; /* Se nota un poco más al pasar el ratón */
-  background: #f0f0f0;
+.btn-eliminar:hover{ color: #ff5252; }
+
+.total-box {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px dashed #e8f0e8;
 }
 
 .total{
-  font-size:20px;
+  font-size:22px;
   font-weight:600;
-  margin-top:15px;
-  color:#1b5e20;
+  color: var(--primary);
+  display: flex;
+  justify-content: space-between;
 }
 
 button#btnEnviar{
   width:100%;
-  padding:15px;
-  font-size:17px;
-  font-weight:600;
-  background:linear-gradient(135deg,#43a047,#2e7d32);
-  color:white;
-  border:none;
-  border-radius:14px;
-  cursor:pointer;
-  margin-top:15px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+  box-shadow: 0 10px 20px rgba(46, 125, 50, 0.2);
+  transition: all 0.3s;
 }
 
-button#btnEnviar:disabled{opacity:0.6;}
+button#btnEnviar:hover:not(:disabled){
+  background: #256329;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 25px rgba(46, 125, 50, 0.3);
+}
 
-.req{color:#c62828;font-size:12px;margin-left:4px;}
+button#btnEnviar:disabled{ opacity: 0.5; cursor: not-allowed; }
+
+.req{color:#e53935; margin-left:2px;}
 
 .gracias-card{
-  max-width:600px;
-  margin:60px auto;
-  background:white;
-  border-radius:20px;
-  padding:30px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.08);
-  text-align:center;
+  max-width: 500px;
+  margin: 80px auto;
+  background: white;
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  text-align: center;
 }
 
 /* RESPONSIVE */
 @media(max-width:900px){
-  .layout{
-    flex-direction:column;
-  }
-
-  .col-der{
-    position:static;
-  }
+  .layout{ flex-direction:column; }
+  .col-izq, .col-der { max-width: 100%; width: 100%; }
+  .col-der{ position: static; }
 }
 </style>
 </head>
@@ -187,41 +256,47 @@ button#btnEnviar:disabled{opacity:0.6;}
 <div class="contenedor">
 
 <div class="logo">
-  <img src="https://lh3.googleusercontent.com/d/1p5CySNTWSX8fl02aYOr1VVRlTWLSZI-e">
+  <img src="https://lh3.googleusercontent.com/d/1p5CySNTWSX8fl02aYOr1VVRlTWLSZI-e" alt="Logo">
 </div>
 
-<h1>🛒 Hacer Pedido</h1>
+<h1>Hacer Pedido</h1>
 
 <div class="layout">
 
-<div class="col-izq">
+  <div class="col-izq">
+    <div class="form-box">
+      <label class="label-form">Nombre completo <span class="req">*</span></label>
+      <input id="nombre" placeholder="Ej. Juan Pérez">
 
-<div class="form-box">
-  <div>Nombre <span class="req">*</span></div>
-  <input id="nombre" placeholder="Tu nombre">
+      <label class="label-form">Teléfono de contacto <span class="req">*</span></label>
+      <input id="movil" placeholder="9 cifras"
+        inputmode="numeric"
+        maxlength="9"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)">
+    </div>
 
-  <div>Teléfono <span class="req">*</span></div>
-  <input id="movil" placeholder="Tu teléfono"
-    inputmode="numeric"
-    maxlength="9"
-    oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)">
-</div>
+    <div id="productos">
+      </div>
 
-<div id="productos"></div>
+    <div class="form-box">
+      <label class="label-form">Observaciones o alergias:</label>
+      <textarea id="observaciones" placeholder="¿Alguna instrucción especial?"></textarea>
+    </div>
+  </div>
 
-<div class="form-box">
-  <div>Observaciones:</div>
-  <textarea id="observaciones"></textarea>
-</div>
-
-</div>
-
-<div class="col-der">
-  <h2>🧾 Tu Pedido</h2>
-  <div id="resumen"></div>
-  <div class="total">Total: €<span id="total">0.00</span></div>
-  <button id="btnEnviar" onclick="enviarPedido()">ENVIAR PEDIDO</button>
-</div>
+  <div class="col-der">
+    <h2 style="margin-top:0; border:none;">Tu Carrito</h2>
+    <div id="resumen"></div>
+    
+    <div class="total-box">
+      <div class="total">
+        <span>Total</span>
+        <span>€<span id="total">0.00</span></span>
+      </div>
+    </div>
+    
+    <button id="btnEnviar" onclick="enviarPedido()">CONFIRMAR PEDIDO</button>
+  </div>
 
 </div>
 </div>
@@ -259,7 +334,10 @@ function mostrarProductos(){
 
       cont.innerHTML += `
         <div class="producto">
-          <div>${p.nombre} (${p.formato}) - €${p.precio}</div>
+          <div class="prod-info">
+            <span class="prod-name">${p.nombre}</span>
+            <span class="prod-meta">${p.formato} • €${p.precio.toFixed(2)}</span>
+          </div>
           <select id="select-${p.id}" onchange="cambiarCantidad(${p.id}, this.value)">
             ${opciones}
           </select>
@@ -294,7 +372,7 @@ function actualizarResumen(){
         <div class="resumen-item">
           <div class="resumen-info">
             <strong>${carrito[id]} x ${p.nombre}</strong>
-            <span>€${subtotal.toFixed(2)}</span>
+            <span style="font-size:12px; color: #557055;">€${subtotal.toFixed(2)}</span>
           </div>
           <button class="btn-eliminar" onclick="eliminarProducto(${id})" title="Quitar">✕</button>
         </div>`;
@@ -302,7 +380,7 @@ function actualizarResumen(){
   }
 
   if(resumenHTML === ""){
-    resumenHTML = "<p style='font-size:14px;color:#777;'>No has añadido productos</p>";
+    resumenHTML = "<p style='font-size:14px;color:#99a;text-align:center;margin:20px 0;'>El carrito está vacío</p>";
   }
 
   document.getElementById("resumen").innerHTML = resumenHTML;
@@ -311,27 +389,18 @@ function actualizarResumen(){
 
 function enviarPedido(){
   if(enviando) return;
-  enviando = true;
-
-  const btn = document.getElementById("btnEnviar");
-  btn.disabled = true;
-  btn.innerText = "ENVIANDO...";
-
+  
   const nombre = document.getElementById("nombre").value.trim();
   const movil = document.getElementById("movil").value.trim();
   const observaciones = document.getElementById("observaciones").value.trim();
 
   if(!nombre || movil.length !== 9){
-    alert("Completa nombre y teléfono (9 dígitos)");
-    btn.disabled=false;
-    btn.innerText="ENVIAR PEDIDO";
-    enviando=false;
+    alert("Por favor, rellena tu nombre y un teléfono válido.");
     return;
   }
 
   let resumenTexto = "";
   let total = 0;
-
   for(let id in carrito){
     if(carrito[id] > 0){
       let p = productos[id];
@@ -342,12 +411,14 @@ function enviarPedido(){
   }
 
   if(total === 0){
-    alert("No has añadido productos");
-    btn.disabled=false;
-    btn.innerText="ENVIAR PEDIDO";
-    enviando=false;
+    alert("Selecciona al menos un producto.");
     return;
   }
+
+  enviando = true;
+  const btn = document.getElementById("btnEnviar");
+  btn.disabled = true;
+  btn.innerText = "PROCESANDO...";
 
   fetch(API_URL,{
     method:"POST",
@@ -357,16 +428,22 @@ function enviarPedido(){
   .then(()=>{
     document.body.innerHTML = `
       <div class="gracias-card">
-        <h1>✅ ¡Gracias por tu pedido!</h1>
-        <pre>${resumenTexto}</pre>
-        <h2>Total €${total.toFixed(2)}</h2>
+        <div style="font-size: 50px; margin-bottom: 20px;">🎉</div>
+        <h1 style="margin-bottom:10px;">¡Pedido Recibido!</h1>
+        <p>Gracias por tu compra, <strong>${nombre}</strong>. En breve nos pondremos en contacto contigo.</p>
+        <div style="background:#f9f9f9; padding:20px; border-radius:15px; text-align:left; margin-top:20px; font-size:14px;">
+          <pre style="white-space:pre-wrap; font-family:inherit;">${resumenTexto}</pre>
+          <hr style="border:0; border-top:1px solid #ddd; margin:10px 0;">
+          <strong>Total: €${total.toFixed(2)}</strong>
+        </div>
+        <button onclick="location.reload()" style="background:none; border:none; color:#2e7d32; text-decoration:underline; cursor:pointer; margin-top:20px;">Hacer otro pedido</button>
       </div>
     `;
   })
   .catch(()=>{
-    alert("Error enviando pedido");
+    alert("Hubo un error. Por favor, inténtalo de nuevo.");
     btn.disabled=false;
-    btn.innerText="ENVIAR PEDIDO";
+    btn.innerText="CONFIRMAR PEDIDO";
     enviando=false;
   });
 }
