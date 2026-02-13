@@ -305,7 +305,8 @@ function mostrarAvisoMail(mensaje) {
     const mailUrl = "mailto:verderebeldemadrid@gmail.com?subject=Quiero%20hacer%20un%20pedido";
     document.getElementById("app-body").innerHTML = `
         <div class="aviso-mail-box">
-            <h2 style="border:none; font-size:24px; padding:0; margin-bottom:20px; line-height:1.4;">${mensaje}</h2>
+            <h2 style="border:none; font-size:24px; padding:0; margin-bottom:10px; line-height:1.4;">${mensaje}</h2>
+            <p style="margin-bottom:25px; color:var(--primary); font-weight:600;">verderebeldemadrid@gmail.com</p>
             <a href="${mailUrl}" class="btn-verde" style="text-decoration:none; display:block;">ESCRIBIR CORREO</a>
         </div>
     `;
@@ -410,7 +411,8 @@ function enviarPedido(){
   .then(()=>{
     document.body.innerHTML = `
       <div class="gracias-card">
-        <h1 style="color:var(--primary)">✅ ¡Pedido Enviado!</h1>
+        <h1 style="color:var(--primary); margin-bottom:5px;">✅ ¡Pedido Enviado!</h1>
+        <p style="margin-bottom:20px; color:#666;">te confirmaremos lo antes posible</p>
         <p>Gracias <strong>${nombre}</strong>.</p>
         <div style="text-align:left; background:#f4fbf6; padding:20px; border-radius:15px; margin-top:20px; font-size:14px; border:1px solid #e0eee0;">
           <pre style="white-space:pre-wrap; font-family:inherit;">${resumenTexto}</pre>
