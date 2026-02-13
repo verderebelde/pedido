@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pedido Online | Mercado Fresco</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
@@ -15,7 +16,9 @@
   --text: #2f3e2f;
   --bg: #f8faf8;
 }
+
 *{ box-sizing:border-box; }
+
 body{
   font-family:'Montserrat', sans-serif;
   margin:0;
@@ -24,172 +27,367 @@ body{
   background-color: var(--bg);
   padding-bottom: 120px; 
 }
-.contenedor{ max-width: 1000px; margin:0 auto; }
+
+.contenedor{
+  max-width: 1000px; 
+  margin:0 auto;
+}
+
 .logo{text-align:center; margin: 10px 0;}
 .logo img{max-width:170px; height:auto;}
 
-/* DISEÑO PARA EL AVISO GIGANTE */
-.aviso-gigante {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  text-align: center;
-  padding: 40px;
-  background: white;
-  border-radius: 25px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-  margin-top: 20px;
-  border: 1px solid #eee;
-}
-.aviso-gigante h2 {
-  font-size: 1.8rem;
+h1{
+  text-align:center;
+  margin:10px 0 30px 0;
   color: var(--primary);
-  border: none;
-  padding: 0;
-  margin-bottom: 25px;
-  line-height: 1.4;
+  font-weight:600;
 }
 
-/* BOTÓN DE MAIL */
-.btn-mail {
-  display: inline-block;
-  background: var(--primary);
-  color: white;
-  text-decoration: none;
-  padding: 18px 30px;
-  border-radius: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  transition: background 0.3s;
-  box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+.layout{
+  display:flex;
+  gap:30px;
+  align-items:flex-start;
 }
-.btn-mail:hover { background: var(--primary-dark); }
 
-/* ESTILOS ORIGINALES */
-h1{ text-align:center; margin:10px 0 30px 0; color: var(--primary); font-weight:600; }
-.layout{ display:flex; gap:30px; align-items:flex-start; }
-.col-izq{ flex: 1.5; max-width: 580px; }
-.col-der{ flex: 1; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: sticky; top: 20px; border: 1px solid #edf2ed; }
-.form-box{ background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid #edf2ed; }
-.label-form { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--primary); display: block; }
-input, textarea{ padding: 12px; margin-bottom: 12px; width: 100%; border-radius: 10px; border: 1.5px solid #e0eee0; font-size: 15px; background: #fdfdfd; }
-h2{ margin: 30px 0 10px 0; font-size: 1.1rem; color: var(--primary); font-weight: 600; border-left: 5px solid var(--accent); padding-left: 12px; }
-.producto{ display:flex; justify-content:space-between; align-items:center; background:white; padding:14px 18px; margin:10px 0; border-radius:14px; border: 1px solid #f0f4f0; }
+.col-izq{
+  flex: 1.5;
+  max-width: 580px; 
+}
+
+.col-der{
+  flex: 1;
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 20px;
+  border: 1px solid #edf2ed;
+}
+
+.form-box{
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  margin-bottom: 20px;
+  border: 1px solid #edf2ed;
+}
+
+.label-form {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--primary);
+  display: block;
+}
+
+input, textarea{
+  padding: 12px;
+  margin-bottom: 12px;
+  width: 100%;
+  border-radius: 10px;
+  border: 1.5px solid #e0eee0;
+  font-size: 15px;
+  background: #fdfdfd;
+}
+
+h2{
+  margin: 30px 0 10px 0;
+  font-size: 1.1rem;
+  color: var(--primary);
+  font-weight: 600;
+  border-left: 5px solid var(--accent);
+  padding-left: 12px;
+}
+
+.producto{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:white;
+  padding:14px 18px;
+  margin:10px 0;
+  border-radius:14px;
+  border: 1px solid #f0f4f0;
+}
+
 .prod-info { display: flex; flex-direction: column; }
 .prod-name { font-weight: 500; font-size: 14px; }
 .prod-meta { font-size: 12px; color: #88a088; }
-.mobile-footer { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; box-shadow: 0 -8px 25px rgba(0,0,0,0.1); z-index: 1000; flex-direction: column; gap: 10px; }
-.btn-verde { width: 100%; padding: 18px; font-size: 16px; font-weight: 700; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; text-transform: uppercase; }
+
+select{
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #c8d6c8;
+  width: 85px;
+  font-weight: 600;
+  background: #f1f8f1;
+}
+
+.resumen-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:13px;
+  margin-bottom:8px;
+  background: var(--primary-light);
+  padding: 10px 12px;
+  border-radius:10px;
+}
+
+.btn-eliminar{
+  background: transparent;
+  color: #ccc;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.total-box {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.total-label { font-size: 14px; color: #666; }
+.total-amount { 
+  font-size: 24px; 
+  font-weight: 700; 
+  color: var(--primary); 
+  display: block;
+  margin-bottom: 15px;
+}
+
+.btn-verde {
+  width: 100%;
+  padding: 18px;
+  font-size: 16px;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-verde:hover { background: var(--primary-dark); }
+
+#resumen-movil-contenedor { display: none; }
+
+.mobile-footer {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 15px 20px;
+  box-shadow: 0 -8px 25px rgba(0,0,0,0.1);
+  z-index: 1000;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mobile-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 @media(max-width:900px){
+  body { padding-bottom: 140px; }
   .layout { flex-direction:column; }
-  .col-der { display: none; }
+  .col-izq, .col-der { max-width: 100%; width: 100%; }
+  .col-der { display: none; } 
+  #resumen-movil-contenedor { display: block; margin-top: 20px; }
   .mobile-footer { display: flex; }
+}
+
+/* Estilo aviso mail */
+.aviso-mail-box {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  margin: 40px auto;
+  max-width: 600px;
 }
 </style>
 </head>
 
 <body>
-<div class="contenedor">
-  <div class="logo"><img src="https://lh3.googleusercontent.com/d/1p5CySNTWSX8fl02aYOr1VVRlTWLSZI-e" alt="Logo"></div>
-  <div id="hoja-de-pedido">
+
+<div class="contenedor" id="contenedor-principal">
+  <div class="logo">
+    <img src="https://lh3.googleusercontent.com/d/1p5CySNTWSX8fl02aYOr1VVRlTWLSZI-e" alt="Logo">
+  </div>
+
+  <div id="app-body">
     <h1>Hacer Pedido</h1>
     <div class="layout">
       <div class="col-izq">
         <div class="form-box">
-          <label class="label-form">Nombre *</label>
+          <label class="label-form">Nombre <span class="req">*</span></label>
           <input id="nombre" placeholder="Tu nombre">
-          <label class="label-form">Teléfono *</label>
-          <input id="movil" placeholder="9 dígitos" inputmode="numeric" maxlength="9">
+          <label class="label-form">Teléfono <span class="req">*</span></label>
+          <input id="movil" placeholder="9 dígitos" inputmode="numeric" maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)">
         </div>
+
         <div id="productos"></div>
+
         <div class="form-box">
           <label class="label-form">Observaciones:</label>
           <textarea id="observaciones"></textarea>
         </div>
+
+        <div id="resumen-movil-contenedor">
+           <h2 style="margin-top:0;">Resumen de compra</h2>
+           <div id="resumen-movil"></div>
+        </div>
       </div>
+
       <div class="col-der">
-        <h2>Tu Pedido</h2>
+        <h2 style="margin-top:0; border:none; padding:0;">Tu Pedido</h2>
         <div id="resumen-desktop"></div>
-        <div id="total-desktop-div" style="margin-top:15px;">
-           <strong>Total: €<span id="total-desktop">0.00</span></strong>
-           <button class="btn-verde" style="margin-top:10px" onclick="enviarPedido()">ENVIAR PEDIDO</button>
+        <div class="total-box">
+          <span class="total-label">Total del pedido:</span>
+          <span class="total-amount">€<span id="total-desktop">0.00</span></span>
+          <button class="btn-verde" id="btnEnviarDesktop" onclick="enviarPedido()">ENVIAR PEDIDO</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="mobile-footer" id="footer-movil">
-  <div style="display:flex; justify-content:space-between">
-    <span>Total:</span>
-    <strong>€<span id="total-mobile">0.00</span></strong>
+<div class="mobile-footer" id="mobile-footer">
+  <div class="mobile-footer-row">
+    <span style="font-size: 14px; font-weight: 500; color: #666;">Total a pagar</span>
+    <span style="font-size: 20px; font-weight: 700; color: var(--primary);">€<span id="total-mobile">0.00</span></span>
   </div>
-  <button class="btn-verde" onclick="enviarPedido()">ENVIAR PEDIDO</button>
+  <button class="btn-verde" id="btnEnviarMobile" onclick="enviarPedido()">ENVIAR PEDIDO</button>
 </div>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbxB0e7ZgF58IhOT6XrdpXN_P5F4fyToTioAOKBuLkDDs1hMS1WL6x7SY6ec7DLDHnXu/exec";
+
 let productos = [];
 let carrito = {};
+let enviando = false;
 
 fetch(API_URL + "?action=productos")
 .then(r => r.json())
-.then(data => {
-    // Si la fila 2 no tiene categoría o dice "MAIL", mostramos el aviso con el botón
+.then(data => { 
+    // Comprobar si la fila 2 es aviso de mail
     if (data.length === 0 || !data[0].categoria || data[0].nombre.includes("MAIL")) {
-        const mensaje = data.length > 0 ? data[0].nombre : "SI QUIERES HACER UN PEDIDO ESCRIBENOS UN MAIL, GRACIAS!";
-        const mailLink = "mailto:verderebeldemadrid@gmail.com?subject=Quiero%20hacer%20un%20pedido";
-        
-        document.getElementById("hoja-de-pedido").innerHTML = `
-            <div class="aviso-gigante">
-                <h2>${mensaje}</h2>
-                <a href="${mailLink}" class="btn-mail">Enviar Email ahora</a>
-            </div>`;
-        
-        document.getElementById("footer-movil").style.display = "none";
+        const texto = data.length > 0 ? data[0].nombre : "SI QUIERES HACER UN PEDIDO ESCRIBENOS UN MAIL, GRACIAS!";
+        mostrarAvisoMail(texto);
         return;
     }
-    productos = data;
-    mostrarProductos();
+    productos = data; 
+    mostrarProductos(); 
 });
+
+function mostrarAvisoMail(mensaje) {
+    const mailUrl = "mailto:verderebeldemadrid@gmail.com?subject=Quiero%20hacer%20un%20pedido";
+    document.getElementById("app-body").innerHTML = `
+        <div class="aviso-mail-box">
+            <h2 style="border:none; font-size:24px; padding:0; margin-bottom:20px;">${mensaje}</h2>
+            <a href="${mailUrl}" class="btn-verde" style="text-decoration:none; display:block;">ESCRIBIR CORREO</a>
+        </div>
+    `;
+    document.getElementById("mobile-footer").style.display = "none";
+}
 
 function mostrarProductos(){
   const cont = document.getElementById("productos");
+  cont.innerHTML = "";
   let categorias = {};
+
   productos.forEach((p,i)=>{
     if(!categorias[p.categoria]) categorias[p.categoria]=[];
     categorias[p.categoria].push({...p,id:i});
   });
+
   for(let cat in categorias){
-    let html = `<h2>${cat}</h2>`;
+    cont.innerHTML += `<h2>${cat}</h2>`;
     categorias[cat].forEach(p=>{
-      html += `<div class="producto">
-        <div class="prod-info"><span class="prod-name">${p.nombre}</span><span class="prod-meta">€${p.precio.toFixed(2)}</span></div>
-        <select onchange="cambiarCantidad(${p.id}, this.value)">
-          <option value="0">0</option>
-          ${Array.from({length: 10}, (_, i) => `<option value="${(i+1)*p.salto}">${((i+1)*p.salto).toFixed(2)}</option>`).join('')}
-        </select>
-      </div>`;
+      let opciones = `<option value="0">0</option>`;
+      let valor = parseFloat(p.minimo);
+      while(valor <= p.maximo){
+        opciones += `<option value="${valor}">${valor}</option>`;
+        valor += parseFloat(p.salto);
+      }
+
+      cont.innerHTML += `
+        <div class="producto">
+          <div class="prod-info">
+            <span class="prod-name">${p.nombre}</span>
+            <span class="prod-meta">${p.formato} - €${p.precio.toFixed(2)}</span>
+          </div>
+          <select id="select-${p.id}" onchange="cambiarCantidad(${p.id}, this.value)">
+            ${opciones}
+          </select>
+        </div>`;
     });
-    cont.innerHTML += html;
   }
 }
 
-function cambiarCantidad(id, cant) {
-    carrito[id] = parseFloat(cant);
-    let total = 0;
-    for(let i in carrito) { total += carrito[i] * productos[i].precio; }
-    document.getElementById("total-desktop").innerText = total.toFixed(2);
-    document.getElementById("total-mobile").innerText = total.toFixed(2);
+function cambiarCantidad(id, cantidad){
+  carrito[id] = parseFloat(cantidad) || 0;
+  actualizarResumen();
+}
+
+function eliminarProducto(id){
+  carrito[id] = 0;
+  const select = document.getElementById("select-" + id);
+  if(select) select.value = 0;
+  actualizarResumen();
+}
+
+function actualizarResumen(){
+  let resumenHTML = "";
+  let total = 0;
+
+  for(let id in carrito){
+    if(carrito[id] > 0){
+      let p = productos[id];
+      let subtotal = carrito[id] * p.precio;
+      total += subtotal;
+
+      resumenHTML += `
+        <div class="resumen-item">
+          <div class="resumen-info">
+            <strong>${carrito[id]} x ${p.nombre}</strong>
+          </div>
+          <button class="btn-eliminar" onclick="eliminarProducto(${id})">✕</button>
+        </div>`;
+    }
+  }
+
+  const vacio = "<p style='font-size:13px;color:#999;text-align:center;'>Aún no has añadido nada</p>";
+  document.getElementById("resumen-desktop").innerHTML = resumenHTML || vacio;
+  document.getElementById("resumen-movil").innerHTML = resumenHTML || vacio;
+  document.getElementById("total-desktop").innerText = total.toFixed(2);
+  document.getElementById("total-mobile").innerText = total.toFixed(2);
 }
 
 function enviarPedido(){
-    const nombre = document.getElementById("nombre").value;
-    if(!nombre) return alert("Por favor, pon tu nombre");
-    alert("Función de envío activada para: " + nombre);
+  if(enviando) return;
+  const nombre = document.getElementById("nombre").value.trim();
+  const movil = document.getElementById("movil").value.trim();
+  if(!nombre || movil.length !== 9){ alert("Completa nombre y teléfono (9 dígitos)"); return; }
+  
+  let total = 0;
+  for(let id in carrito){ total += (carrito[id] * productos[id].precio); }
+  if(total === 0){ alert("El carrito está vacío"); return; }
+  
+  alert("Pedido enviado para " + nombre);
 }
 </script>
 </body>
