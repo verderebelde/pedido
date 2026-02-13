@@ -208,7 +208,16 @@ select{
   .mobile-footer { display: flex; }
 }
 
-/* Estilo aviso mail */
+.gracias-card {
+  max-width: 500px;
+  margin: 60px auto;
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
 .aviso-mail-box {
   background: white;
   padding: 40px;
@@ -283,7 +292,6 @@ let enviando = false;
 fetch(API_URL + "?action=productos")
 .then(r => r.json())
 .then(data => { 
-    // Comprobar si la fila 2 es aviso de mail
     if (data.length === 0 || !data[0].categoria || data[0].nombre.includes("MAIL")) {
         const texto = data.length > 0 ? data[0].nombre : "SI QUIERES HACER UN PEDIDO ESCRIBENOS UN MAIL, GRACIAS!";
         mostrarAvisoMail(texto);
@@ -297,7 +305,7 @@ function mostrarAvisoMail(mensaje) {
     const mailUrl = "mailto:verderebeldemadrid@gmail.com?subject=Quiero%20hacer%20un%20pedido";
     document.getElementById("app-body").innerHTML = `
         <div class="aviso-mail-box">
-            <h2 style="border:none; font-size:24px; padding:0; margin-bottom:20px;">${mensaje}</h2>
+            <h2 style="border:none; font-size:24px; padding:0; margin-bottom:20px; line-height:1.4;">${mensaje}</h2>
             <a href="${mailUrl}" class="btn-verde" style="text-decoration:none; display:block;">ESCRIBIR CORREO</a>
         </div>
     `;
@@ -308,12 +316,10 @@ function mostrarProductos(){
   const cont = document.getElementById("productos");
   cont.innerHTML = "";
   let categorias = {};
-
   productos.forEach((p,i)=>{
     if(!categorias[p.categoria]) categorias[p.categoria]=[];
     categorias[p.categoria].push({...p,id:i});
   });
-
   for(let cat in categorias){
     cont.innerHTML += `<h2>${cat}</h2>`;
     categorias[cat].forEach(p=>{
@@ -323,7 +329,6 @@ function mostrarProductos(){
         opciones += `<option value="${valor}">${valor}</option>`;
         valor += parseFloat(p.salto);
       }
-
       cont.innerHTML += `
         <div class="producto">
           <div class="prod-info">
@@ -353,23 +358,18 @@ function eliminarProducto(id){
 function actualizarResumen(){
   let resumenHTML = "";
   let total = 0;
-
   for(let id in carrito){
     if(carrito[id] > 0){
       let p = productos[id];
       let subtotal = carrito[id] * p.precio;
       total += subtotal;
-
       resumenHTML += `
         <div class="resumen-item">
-          <div class="resumen-info">
-            <strong>${carrito[id]} x ${p.nombre}</strong>
-          </div>
+          <div class="resumen-info"><strong>${carrito[id]} x ${p.nombre}</strong></div>
           <button class="btn-eliminar" onclick="eliminarProducto(${id})">✕</button>
         </div>`;
     }
   }
-
   const vacio = "<p style='font-size:13px;color:#999;text-align:center;'>Aún no has añadido nada</p>";
   document.getElementById("resumen-desktop").innerHTML = resumenHTML || vacio;
   document.getElementById("resumen-movil").innerHTML = resumenHTML || vacio;
@@ -381,13 +381,52 @@ function enviarPedido(){
   if(enviando) return;
   const nombre = document.getElementById("nombre").value.trim();
   const movil = document.getElementById("movil").value.trim();
+  const observaciones = document.getElementById("observaciones").value.trim();
+
   if(!nombre || movil.length !== 9){ alert("Completa nombre y teléfono (9 dígitos)"); return; }
-  
+
+  let resumenTexto = "";
   let total = 0;
-  for(let id in carrito){ total += (carrito[id] * productos[id].precio); }
+  for(let id in carrito){
+    if(carrito[id] > 0){
+      let p = productos[id];
+      let subtotal = carrito[id] * p.precio;
+      total += subtotal;
+      resumenTexto += `${carrito[id]} x ${p.nombre} - €${subtotal.toFixed(2)}\n`;
+    }
+  }
+
   if(total === 0){ alert("El carrito está vacío"); return; }
-  
-  alert("Pedido enviado para " + nombre);
+
+  enviando = true;
+  document.getElementById("btnEnviarDesktop").innerText = "ENVIANDO...";
+  document.getElementById("btnEnviarMobile").innerText = "ENVIANDO...";
+
+  fetch(API_URL,{
+    method:"POST",
+    body: JSON.stringify({ nombre, movil, pedido: resumenTexto, total, observaciones })
+  })
+  .then(r => r.json())
+  .then(()=>{
+    document.body.innerHTML = `
+      <div class="gracias-card">
+        <h1 style="color:var(--primary)">✅ ¡Pedido Enviado!</h1>
+        <p>Gracias <strong>${nombre}</strong>.</p>
+        <div style="text-align:left; background:#f4fbf6; padding:20px; border-radius:15px; margin-top:20px; font-size:14px; border:1px solid #e0eee0;">
+          <pre style="white-space:pre-wrap; font-family:inherit;">${resumenTexto}</pre>
+          <hr style="border:0; border-top:1px solid #ddd; margin:10px 0;">
+          <strong>Total: €${total.toFixed(2)}</strong>
+        </div>
+        <button onclick="location.reload()" style="margin-top:30px; background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; text-decoration:underline;">Volver a la tienda</button>
+      </div>`;
+    window.scrollTo(0,0);
+  })
+  .catch(()=>{
+    alert("Error al enviar");
+    enviando = false;
+    document.getElementById("btnEnviarDesktop").innerText = "ENVIAR PEDIDO";
+    document.getElementById("btnEnviarMobile").innerText = "ENVIAR PEDIDO";
+  });
 }
 </script>
 </body>
