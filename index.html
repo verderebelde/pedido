@@ -28,7 +28,7 @@ body{
 .logo{text-align:center; margin: 10px 0;}
 .logo img{max-width:170px; height:auto;}
 
-/* Estilo para el mensaje grande cuando no hay productos */
+/* DISEÑO PARA EL AVISO GIGANTE */
 .aviso-gigante {
   display: flex;
   flex-direction: column;
@@ -36,21 +36,38 @@ body{
   justify-content: center;
   min-height: 60vh;
   text-align: center;
-  padding: 30px;
+  padding: 40px;
   background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  border-radius: 25px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
   margin-top: 20px;
+  border: 1px solid #eee;
 }
 .aviso-gigante h2 {
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: var(--primary);
   border: none;
   padding: 0;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  line-height: 1.4;
 }
 
-/* Resto de estilos originales */
+/* BOTÓN DE MAIL */
+.btn-mail {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  padding: 18px 30px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: background 0.3s;
+  box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+}
+.btn-mail:hover { background: var(--primary-dark); }
+
+/* ESTILOS ORIGINALES */
 h1{ text-align:center; margin:10px 0 30px 0; color: var(--primary); font-weight:600; }
 .layout{ display:flex; gap:30px; align-items:flex-start; }
 .col-izq{ flex: 1.5; max-width: 580px; }
@@ -121,15 +138,17 @@ let carrito = {};
 fetch(API_URL + "?action=productos")
 .then(r => r.json())
 .then(data => {
-    // LÓGICA PARA FILA 2 VACÍA O CON MENSAJE
-    // Si no hay datos, o el primer item no tiene categoría, es el mensaje de aviso
+    // Si la fila 2 no tiene categoría o dice "MAIL", mostramos el aviso con el botón
     if (data.length === 0 || !data[0].categoria || data[0].nombre.includes("MAIL")) {
         const mensaje = data.length > 0 ? data[0].nombre : "SI QUIERES HACER UN PEDIDO ESCRIBENOS UN MAIL, GRACIAS!";
+        const mailLink = "mailto:verderebeldemadrid@gmail.com?subject=Quiero%20hacer%20un%20pedido";
+        
         document.getElementById("hoja-de-pedido").innerHTML = `
             <div class="aviso-gigante">
                 <h2>${mensaje}</h2>
-                <div style="width:50px; hieght:4px; background:var(--accent); height:4px; border-radius:2px;"></div>
+                <a href="${mailLink}" class="btn-mail">Enviar Email ahora</a>
             </div>`;
+        
         document.getElementById("footer-movil").style.display = "none";
         return;
     }
@@ -151,7 +170,7 @@ function mostrarProductos(){
         <div class="prod-info"><span class="prod-name">${p.nombre}</span><span class="prod-meta">€${p.precio.toFixed(2)}</span></div>
         <select onchange="cambiarCantidad(${p.id}, this.value)">
           <option value="0">0</option>
-          ${Array.from({length: 10}, (_, i) => `<option value="${(i+1)*p.salto}">${(i+1)*p.salto}</option>`).join('')}
+          ${Array.from({length: 10}, (_, i) => `<option value="${(i+1)*p.salto}">${((i+1)*p.salto).toFixed(2)}</option>`).join('')}
         </select>
       </div>`;
     });
@@ -169,8 +188,8 @@ function cambiarCantidad(id, cant) {
 
 function enviarPedido(){
     const nombre = document.getElementById("nombre").value;
-    if(!nombre) return alert("Pon tu nombre");
-    alert("Pedido enviado para: " + nombre);
+    if(!nombre) return alert("Por favor, pon tu nombre");
+    alert("Función de envío activada para: " + nombre);
 }
 </script>
 </body>
