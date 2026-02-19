@@ -289,6 +289,14 @@ let productos = [];
 let carrito = {};
 let enviando = false;
 
+// AL CARGAR LA PÁGINA: Intentar recuperar datos guardados
+window.onload = function() {
+    const savedNombre = localStorage.getItem("mf_nombre");
+    const savedMovil = localStorage.getItem("mf_movil");
+    if(savedNombre) document.getElementById("nombre").value = savedNombre;
+    if(savedMovil) document.getElementById("movil").value = savedMovil;
+};
+
 fetch(API_URL + "?action=productos")
 .then(r => r.json())
 .then(data => { 
@@ -385,6 +393,10 @@ function enviarPedido(){
   const observaciones = document.getElementById("observaciones").value.trim();
 
   if(!nombre || movil.length !== 9){ alert("Completa nombre y teléfono (9 dígitos)"); return; }
+
+  // GUARDAR DATOS EN EL NAVEGADOR PARA LA PRÓXIMA VEZ
+  localStorage.setItem("mf_nombre", nombre);
+  localStorage.setItem("mf_movil", movil);
 
   let resumenTexto = "";
   let total = 0;
