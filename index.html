@@ -240,6 +240,22 @@ select{
   margin: 40px auto;
   max-width: 600px;
 }
+
+.aclaraciones-box {
+  background: #fffbea;
+  border: 1px solid #f0e2a3;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: #6b5b00;
+}
+
+.aclaraciones-box pre {
+  white-space: pre-wrap;
+  font-family: inherit;
+  margin: 0;
+}
 </style>
 </head>
 
@@ -312,13 +328,14 @@ window.onload = function() {
 fetch(API_URL + "?action=productos")
 .then(r => r.json())
 .then(data => { 
-    if (data.length === 0 || !data[0].categoria || data[0].nombre.includes("MAIL")) {
-        const texto = data.length > 0 ? data[0].nombre : "SI QUIERES HACER UN PEDIDO ESCRIBENOS UN MAIL, GRACIAS!";
+    if (data.productos.length === 0 || !data.productos[0].categoria || data.productos[0].nombre.includes("MAIL")) {
+        const texto = data.productos.length > 0 ? data.productos[0].nombre : "SI QUIERES HACER UN PEDIDO ESCRIBENOS UN MAIL, GRACIAS!";
         mostrarAvisoMail(texto);
         return;
     }
-    productos = data; 
-    mostrarProductos(); 
+    productos = data.productos; 
+    mostrarProductos();
+    mostrarAclaraciones(data.aclaraciones);
 });
 
 function mostrarAvisoMail(mensaje) {
@@ -331,6 +348,15 @@ function mostrarAvisoMail(mensaje) {
         </div>
     `;
     document.getElementById("mobile-footer").style.display = "none";
+}
+
+function mostrarAclaraciones(texto) {
+    if (!texto || texto.trim() === "") return;
+    const cont = document.getElementById("productos");
+    const div = document.createElement("div");
+    div.className = "aclaraciones-box";
+    div.innerHTML = `<pre>${texto}</pre>`;
+    cont.parentNode.insertBefore(div, cont);
 }
 
 function mostrarProductos(){
