@@ -254,6 +254,7 @@ select{
 .aclaraciones-box pre {
   white-space: pre-wrap;
   font-family: inherit;
+  font-weight: 700;
   margin: 0;
 }
 </style>
@@ -356,7 +357,7 @@ function mostrarAclaraciones(texto) {
     const div = document.createElement("div");
     div.className = "aclaraciones-box";
     div.innerHTML = `<pre>${texto}</pre>`;
-    cont.parentNode.insertBefore(div, cont);
+    cont.parentNode.insertBefore(div, cont.nextSibling);
 }
 
 function mostrarProductos(){
