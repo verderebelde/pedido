@@ -457,12 +457,19 @@ function enviarPedido(){
   document.getElementById("btnEnviarDesktop").innerText = "ENVIANDO...";
   document.getElementById("btnEnviarMobile").innerText = "ENVIANDO...";
 
-  fetch(API_URL,{
-    method:"POST",
-    mode: "no-cors",
-    body: JSON.stringify({ nombre, movil, pedido: resumenTexto, total, observaciones })
-  })
-  .then(()=>{
+  const params = new URLSearchParams({
+    accion: "pedido",
+    nombre,
+    movil,
+    pedido: resumenTexto,
+    total,
+    observaciones
+  });
+
+  fetch(API_URL + "?" + params.toString())
+  .then(r => r.json())
+  .then((data)=>{
+    if(!data.ok){ throw new Error(data.error || "Error desconocido"); }
     document.body.innerHTML = `
       <div class="gracias-card">
         <h1 style="color:var(--primary); margin-bottom:5px;">✅ ¡Pedido Enviado!</h1>
